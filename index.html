@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Breaking Cycles - Empowering Women Through Education</title>
+    
+    <!-- Socket.IO Client -->
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    
+    <style>
+        /* [Previous CSS remains the same - copy from your original file] */
+        
+        /* Add these new styles for auth */
+        .auth-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 3000;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+        
+        .auth-modal.active {
+            display: flex;
+        }
+        
+        .auth-container {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            max-width: 450px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .auth-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #ecf0f1;
+        }
+        
+        .auth-tab {
+            flex: 1;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            color: #7f8c8d;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .auth-tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .auth-form {
+            display: none;
+        }
+        
+        .auth-form.active {
+            display: block;
+        }
+        
+        .typing-indicator {
+            padding: 1rem;
+            font-style: italic;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        .user-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            border: 1px solid #f5c6cb;
+        }
+        
+        /* Copy all previous CSS here */
+    </style>
+</head>
+<body>
+    <!-- Auth Modal -->
+    <div class="auth-modal" id="authModal">
+        <div class="auth-container">
+            <h2 style="text-align: center; margin-bottom: 2rem; color: #2c3e50;">Welcome to Breaking Cycles</h2>
+            
+            <div class="auth-tabs">
+                <div class="auth-tab active" onclick="switchAuthTab('login')">Login</div>
+                <div class="auth-tab" onclick="switchAuthTab('register')">Register</div>
+            </div>
+            
+            <!-- Login Form -->
+            <form id="loginForm" class="auth-form active" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <div id="loginError" class="error-message" style="display: none;"></div>
+                <button type="submit" class="btn-submit">Login</button>
+            </form>
+            
+            <!-- Register Form -->
+            <form id="registerForm" class="auth-form" onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label for="registerName">Full Name</label>
+                    <input type="text" id="registerName" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerEmail">Email</label>
+                    <input type="email" id="registerEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Password</label>
+                    <input type="password" id="registerPassword" required minlength="6">
+                </div>
+                <div class="form-group">
+                    <label for="registerPhone">Phone (optional)</label>
+                    <input type="tel" id="registerPhone">
+                </div>
+                <div class="form-group">
+                    <label for="registerLocation">Location (optional)</label>
+                    <input type="text" id="registerLocation">
+                </div>
+                <div id="registerError" class="error-message" style="display: none;"></div>
+                <button type="submit" class="btn-submit">Register</button>
+            </form>
+            
+            <p style="text-align: center; margin-top: 1.5rem; color: #7f8c8d;">
+                Continue as <a href="#" onclick="closeAuthModal(); return false;" style="color: #667eea;">Guest</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- [Copy all previous HTML sections here: nav, home, learn, community, stories, contact] -->
+    
+    <!-- Updated Chat Modal with Socket.IO integration -->
+    <div class="chat-modal" id="chatModal">
+        <div class="chat-container">
+            <div class="chat-header">
+                <div class="chat-header-info">
+                    <div class="chat-room-icon" id="chatRoomIcon">👶</div>
+                    <div class="chat-room-name">
+                        <h3 id="chatRoomName">Young Mothers Circle</h3>
+                        <p class="chat-room-status"><span id="onlineCount">0</span> members online</p>
+                    </div>
+                </div>
+                <button class="close-chat" onclick="closeChatRoom()">✕</button>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages"></div>
+            <div class="typing-indicator" id="typingIndicator" style="display: none;"></div>
+            
+            <div class="chat-input-container">
+                <div class="chat-input-wrapper">
+                    <input type="text" id="chatInput" placeholder="Share your thoughts, ask questions, or celebrate a win..." onkeypress="handleChatKeyPress(event)" oninput="handleTyping()">
+                    <button class="send-btn" onclick="sendChatMessage()">📤</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_URL = 'http://localhost:3000';
+        let socket = null;
+        let currentUser = null;
+        let currentRoom = null;
+        let typingTimeout = null;
+        
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+            initializeSocketIO();
+        });
+        
+        // ==================== AUTH FUNCTIONS ====================
+        
+        function checkAuth() {
+            const token = localStorage.getItem('token');
+            if (token) {
+                fetchCurrentUser(token);
+            }
+        }
+        
+        async function fetchCurrentUser(token) {
+            try {
+                const response = await fetch(`${API_URL}/api/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    currentUser = data.user;
+                    updateUIForLoggedInUser();
+                } else {
+                    localStorage.removeItem('token');
+                }
+            } catch (error) {
+                console.error('Auth check failed:', error);
+            }
+        }
+        
+        function switchAuthTab(tab) {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tab + 'Form').classList.add('active');
+            
+            // Clear errors
+            document.getElementById('loginError').style.display = 'none';
+            document.getElementById('registerError').style.display = 'none';
+        }
+        
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorDiv = document.getElementById('loginError');
+            
+            try {
+                const response = await fetch(`${API_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    localStorage.setItem('token', data.token);
+                    currentUser = data.user;
+                    updateUIForLoggedInUser();
+                    closeAuthModal();
+                    showSection('community');
+                } else {
+                    errorDiv.textContent = data.error || 'Login failed';
+                    errorDiv.style.display = 'block';
+                }
+            } catch (error) {
+                errorDiv.textContent = 'Network error. Please try again.';
+                errorDiv.style.display = 'block';
+            }
+        }
+        
+        async function handleRegister(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const phone = document.getElementById('registerPhone').value;
+            const location = document.getElementById('registerLocation').value;
+            const errorDiv = document.getElementById('registerError');
+            
+            try {
+                const response = await fetch(`${API_URL}/api/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password, phone, location })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    localStorage.setItem('token', data.token);
+                    currentUser = data.user;
+                    updateUIForLoggedInUser();
+                    closeAuthModal();
+                    showSection('community');
+                } else {
+                    errorDiv.textContent = data.error || 'Registration failed';
+                    errorDiv.style.display = 'block';
+                }
+            } catch (error) {
+                errorDiv.textContent = 'Network error. Please try again.';
+                errorDiv.style.display = 'block';
+            }
+        }
+        
+        function updateUIForLoggedInUser() {
+            // Add user badge to navbar
+            const navContainer = document.querySelector('.nav-container');
+            const existingBadge = document.getElementById('userBadge');
+            
+            if (!existingBadge && currentUser) {
+                const badge = document.createElement('div');
+                badge.id = 'userBadge';
+                badge.className = 'user-badge';
+                badge.innerHTML = `<span>${currentUser.avatar}</span><span>${currentUser.name}</span>`;
+                badge.onclick = logout;
+                navContainer.appendChild(badge);
+            }
+        }
+        
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('token');
+                currentUser = null;
+                location.reload();
+            }
+        }
+        
+        function openAuthModal() {
+            document.getElementById('authModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeAuthModal() {
+            document.getElementById('authModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+        
+        // ==================== SOCKET.IO FUNCTIONS ====================
+        
+        function initializeSocketIO() {
+            socket = io(API_URL);
+            
+            socket.on('connect', () => {
+                console.log('✅ Connected to server');
+            });
+            
+            socket.on('new-message', (message) => {
+                displayNewMessage(message);
+            });
+            
+            socket.on('online-count', (count) => {
+                document.getElementById('onlineCount').textContent = count;
+            });
+            
+            socket.on('user-joined', (data) => {
+                displaySystemMessage(`${data.userName} joined the chat`);
+            });
+            
+            socket.on('user-typing', (data) => {
+                const indicator = document.getElementById('typingIndicator');
+                if (data.isTyping) {
+                    indicator.textContent = `${data.userName} is typing...`;
+                    indicator.style.display = 'block';
+                } else {
+                    indicator.style.display = 'none';
+                }
+            });
+            
+            socket.on('disconnect', () => {
+                console.log('❌ Disconnected from server');
+            });
+        }
+        
+        // ==================== CHAT FUNCTIONS ====================
+        
+        async function openChatRoom(roomName, icon, memberCount) {
+            event.preventDefault();
+            
+            // Check if user is logged in
+            if (!currentUser) {
+                openAuthModal();
+                return;
+            }
+            
+            currentRoom = roomName;
+            
+            // Update UI
+            document.getElementById('chatRoomIcon').textContent = icon;
+            document.getElementById('chatRoomName').textContent = roomName;
+            document.getElementById('chatModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            // Clear messages
+            document.getElementById('chatMessages').innerHTML = '<div style="text-align: center; padding: 2rem; color: #7f8c8d;">Loading messages...</div>';
+            
+            try {
+                // Join room via API
+                await fetch(`${API_URL}/api/rooms/${encodeURIComponent(roomName)}/join`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                
+                // Load messages
+                const response = await fetch(`${API_URL}/api/rooms/${encodeURIComponent(roomName)}/messages`);
+                const data = await response.json();
+                
+                // Display messages
+                displayMessages(data.messages);
+                
+                // Join room via Socket.IO
+                socket.emit('join-room', {
+                    roomName,
+                    userId: currentUser.id,
+                    userName: currentUser.name,
+                    userAvatar: currentUser.avatar
+                });
+                
+                // Focus input
+                setTimeout(() => {
+                    document.getElementById('chatInput').focus();
+                }, 100);
+                
+            } catch (error) {
+                console.error('Error loading chat:', error);
+                document.getElementById('chatMessages').innerHTML = '<div style="text-align: center; padding: 2rem; color: #e74c3c;">Failed to load messages. Please try again.</div>';
+            }
+        }
+        
+        function displayMessages(messages) {
+            const container = document.getElementById('chatMessages');
+            container.innerHTML = '';
+            
+            messages.forEach(message => {
+                displayMessage(message);
+            });
+            
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        function displayMessage(message) {
+            const container = document.getElementById('chatMessages');
+            const messageEl = document.createElement('div');
+            messageEl.className = 'chat-message';
+            
+            const timeAgo = message.time || formatTimeAgo(message.createdAt);
+            
+            messageEl.innerHTML = `
+                <div class="message-avatar">${message.avatar}</div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <span class="message-author">${message.author}</span>
+                        <span class="message-time">${timeAgo}</span>
+                    </div>
+                    <p class="message-text">${escapeHtml(message.text)}</p>
+                </div>
+            `;
+            
+            container.appendChild(messageEl);
+        }
+        
+        function displayNewMessage(message) {
+            displayMessage(message);
+            const container = document.getElementById('chatMessages');
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        function displaySystemMessage(text) {
+            const container = document.getElementById('chatMessages');
+            const messageEl = document.createElement('div');
+            messageEl.style.textAlign = 'center';
+            messageEl.style.padding = '0.5rem';
+            messageEl.style.color = '#7f8c8d';
+            messageEl.style.fontSize = '0.9rem';
+            messageEl.style.fontStyle = 'italic';
+            messageEl.textContent = text;
+            container.appendChild(messageEl);
+        }
+        
+        function sendChatMessage() {
+            if (!currentUser) {
+                openAuthModal();
+                return;
+            }
+            
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            
+            if (text && currentRoom) {
+                socket.emit('send-message', {
+                    roomName: currentRoom,
+                    userId: currentUser.id,
+                    author: currentUser.name,
+                    avatar: currentUser.avatar,
+                    text
+                });
+                
+                input.value = '';
+                input.focus();
+            }
+        }
+        
+        function handleChatKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendChatMessage();
+            }
+        }
+        
+        function handleTyping() {
+            if (!currentUser || !currentRoom) return;
+            
+            socket.emit('typing', {
+                roomName: currentRoom,
+                userName: currentUser.name,
+                isTyping: true
+            });
+            
+            clearTimeout(typingTimeout);
+            typingTimeout = setTimeout(() => {
+                socket.emit('typing', {
+                    roomName: currentRoom,
+                    userName: currentUser.name,
+                    isTyping: false
+                });
+            }, 1000);
+        }
+        
+        function closeChatRoom() {
+            if (currentUser && currentRoom) {
+                socket.emit('leave-room', {
+                    roomName: currentRoom,
+                    userName: currentUser.name
+                });
+            }
+            
+            document.getElementById('chatModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+            document.getElementById('chatInput').value = '';
+            currentRoom = null;
+        }
+        
+        // ==================== UTILITY FUNCTIONS ====================
+        
+        function formatTimeAgo(date) {
+            const seconds = Math.floor((new Date() - new Date(date)) / 1000);
+            
+            if (seconds < 60) return 'Just now';
+            if (seconds < 3600) return Math.floor(seconds / 60) + ' min ago';
+            if (seconds < 86400) return Math.floor(seconds / 3600) + ' hours ago';
+            return Math.floor(seconds / 86400) + ' days ago';
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // ==================== CONTACT FORM ====================
+        
+        async function submitContact(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const contactData = Object.fromEntries(formData);
+            
+            try {
+                const response = await fetch(`${API_URL}/api/contact`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(contactData)
+                });
+                
+                if (response.ok) {
+                    document.getElementById('contactSuccessMessage').style.display = 'block';
+                    event.target.reset();
+                    
+                    setTimeout(() => {
+                        document.getElementById('contactSuccessMessage').style.display = 'none';
+                    }, 5000);
+                }
+            } catch (error) {
+                alert('Failed to send message. Please try again.');
+            }
+        }
+        
+        // [Copy all other JavaScript functions from original file]
+    </script>
+</body>
+</html>
