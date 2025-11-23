@@ -6,7 +6,7 @@ This guide provides step-by-step instructions for testing the Breaking Cycles ap
 
 Before testing, ensure you have:
 - Node.js (v14 or higher) installed
-- MongoDB installed or Docker available
+- MongoDB installed (local installation, cloud Atlas, or Docker)
 - npm or yarn package manager
 
 ## Setup Instructions
@@ -29,23 +29,87 @@ cp .env.example .env
 
 ### 3. Start MongoDB
 
-Choose one of these options:
+Choose one of these options based on what you have available:
 
-**Option A: Using Docker (Recommended)**
+**Option A: Install MongoDB Locally (Recommended if Docker not available)**
+
+For Ubuntu/Debian:
 ```bash
+# Import MongoDB GPG key
+wget -qO - https://www.mongodb.org/static/pgp/server-7.0.asc | sudo apt-key add -
+
+# Add MongoDB repository
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu $(lsb_release -cs)/mongodb-org/7.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
+
+# Update package list
+sudo apt-get update
+
+# Install MongoDB
+sudo apt-get install -y mongodb-org
+
+# Start MongoDB service
+sudo systemctl start mongod
+
+# Enable MongoDB to start on boot
+sudo systemctl enable mongod
+
+# Verify MongoDB is running
+sudo systemctl status mongod
+```
+
+For other Linux distributions:
+```bash
+# Download and extract MongoDB
+wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu2204-7.0.0.tgz
+tar -zxvf mongodb-linux-x86_64-ubuntu2204-7.0.0.tgz
+
+# Move to /usr/local
+sudo mv mongodb-linux-x86_64-ubuntu2204-7.0.0 /usr/local/mongodb
+
+# Create data directory
+sudo mkdir -p /data/db
+sudo chown -R $USER:$USER /data/db
+
+# Start MongoDB
+/usr/local/mongodb/bin/mongod --dbpath /data/db --fork --logpath /var/log/mongodb.log
+
+# Or run in foreground (keep terminal open)
+/usr/local/mongodb/bin/mongod --dbpath /data/db
+```
+
+For macOS:
+```bash
+# Install using Homebrew
+brew tap mongodb/brew
+brew install mongodb-community@7.0
+
+# Start MongoDB service
+brew services start mongodb-community@7.0
+```
+
+For Windows:
+- Download installer from https://www.mongodb.com/try/download/community
+- Run the installer and follow the setup wizard
+- MongoDB will start as a Windows service automatically
+
+**Option B: Using MongoDB Atlas (Cloud - Free Tier Available)**
+- Sign up at https://www.mongodb.com/cloud/atlas
+- Create a free cluster (M0 Sandbox)
+- Click "Connect" → "Connect your application"
+- Copy the connection string
+- Update MONGODB_URI in .env file:
+  ```
+  MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/breaking_cycles
+  ```
+
+**Option C: Using Docker (If Docker is installed)**
+```bash
+# Check if Docker is available
+docker --version
+
+# If Docker is available, run:
 docker run -d --name mongodb -p 27017:27017 mongo:7.0
 ```
-
-**Option B: Using Local MongoDB Installation**
-```bash
-mongod
-```
-
-**Option C: Using MongoDB Atlas (Cloud)**
-- Sign up at https://www.mongodb.com/cloud/atlas
-- Create a free cluster
-- Get your connection string
-- Update MONGODB_URI in .env file
 
 ### 4. Start the Server
 
@@ -286,15 +350,32 @@ node test-api.js
 
 ## Troubleshooting
 
+### Docker not available
+If you get `docker: command not found`, use one of the alternative MongoDB installation methods:
+- **Recommended**: Install MongoDB locally (see Option A in Step 3)
+- **Easy alternative**: Use MongoDB Atlas cloud service (see Option B in Step 3)
+
 ### Server won't start
-- **Check MongoDB is running**: `docker ps` or `mongod` status
+- **Check MongoDB is running**: 
+  - For local install: `sudo systemctl status mongod` (Linux) or check Activity Monitor/Services
+  - For Docker: `docker ps` 
+  - For Atlas: Check your connection string in .env
 - **Check port 3000 is available**: `lsof -i :3000` or `netstat -an | grep 3000`
 - **Check dependencies are installed**: `npm install`
 
 ### Can't connect to MongoDB
-- **Using Docker**: Ensure container is running: `docker ps`
-- **Using local MongoDB**: Ensure mongod service is running
-- **Check connection string**: Verify MONGODB_URI in .env file
+- **Using local MongoDB**: 
+  - Check if service is running: `sudo systemctl status mongod`
+  - Start if needed: `sudo systemctl start mongod`
+  - Check logs: `sudo tail -f /var/log/mongodb/mongod.log`
+- **Using Docker**: 
+  - Ensure container is running: `docker ps`
+  - Check logs: `docker logs mongodb`
+- **Using Atlas**: 
+  - Verify connection string in .env file
+  - Ensure IP is whitelisted in Atlas dashboard
+  - Check username and password are correct
+- **Connection string**: Verify MONGODB_URI in .env file
 
 ### Authentication errors
 - **Invalid token**: Token may have expired (7 days). Register/login again
@@ -337,10 +418,18 @@ When done testing:
 ```bash
 # Stop the server: Press Ctrl+C in terminal
 
-# Stop MongoDB Docker container (if using Docker)
+# Stop MongoDB (choose based on your installation)
+
+# For Docker:
 docker stop mongodb
 docker rm mongodb
 
-# Or stop local MongoDB service
-# (depends on your OS and installation method)
+# For local MongoDB on Linux:
+sudo systemctl stop mongod
+
+# For local MongoDB on macOS:
+brew services stop mongodb-community@7.0
+
+# For MongoDB Atlas:
+# No action needed - just close your application
 ```
