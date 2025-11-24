@@ -6,11 +6,11 @@ const http = require('http');
 const socketIO = require('socket.io');
 
 // Import Models
-const User = require('./models/User');
-const ChatRoom = require('./models/ChatRoom');
-const Message = require('./models/Message');
-const Contact = require('./models/Contact');
-const Enrollment = require('./models/Enrollment');
+const User = require('./models/user');
+const ChatRoom = require('./models/chatroom');
+const Message = require('./models/message');
+const Contact = require('./models/contact');
+const Enrollment = require('./models/enrollment');
 
 // Import Auth Utilities
 const { hashPassword, comparePassword, generateToken, verifyToken } = require('./utils/auth');
