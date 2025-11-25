@@ -1,46 +1,43 @@
+require('dotenv').config();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
-const JWT_EXPIRES_IN = '7d';
+const SALT_ROUNDS = parseInt(process.env.SALT_ROUNDS || '10', 10);
+const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret_change_before_production';
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
 
-/**
- * Hash a password using bcrypt
- * @param {string} password - Plain text password
- * @returns {Promise<string>} - Hashed password
- */
+// Hash a password using bcrypt
 async function hashPassword(password) {
-  const saltRounds = 10;
-  return await bcrypt.hash(password, saltRounds);
+  return bcrypt.hash(password, SALT_ROUNDS);
 }
 
-/**
- * Compare a plain text password with a hashed password
- * @param {string} password - Plain text password
- * @param {string} hashedPassword - Hashed password
- * @returns {Promise<boolean>} - True if passwords match
- */
+// Compare a plain text password with a hashed password
 async function comparePassword(password, hashedPassword) {
-  return await bcrypt.compare(password, hashedPassword);
+  return bcrypt.compare(password, hashedPassword);
 }
 
-/**
- * Generate a JWT token for a user
- * @param {string} userId - User's MongoDB _id
- * @returns {string} - JWT token
- */
-function generateToken(userId) {
-  return jwt.sign({ userId }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+// Generate a JWT token for a user
+function generateToken(userId, opts = {}) {
+  const payload = { userId };
+  const signOptions = {
+    expiresIn: opts.expiresIn || JWT_EXPIRES_IN,
+    // you can add issuer/audience if desired:
+    // issuer: process.env.JWT_ISSUER,
+    // audience: process.env.JWT_AUDIENCE
+  };
+  return jwt.sign(payload, JWT_SECRET, signOptions);
 }
 
-/**
- * Verify a JWT token
- * @param {string} token - JWT token to verify
- * @returns {Object} - Decoded token payload
- * @throws {Error} - If token is invalid
- */
+// Verify a JWT token (throws on invalid)
 function verifyToken(token) {
-  return jwt.verify(token, JWT_SECRET);
+  try {
+    return jwt.verify(token, JWT_SECRET);
+  } catch (err) {
+    // Re-throw a clearer error so calling code can return 401
+    const error = new Error('Invalid or expired token');
+    error.original = err;
+    throw error;
+  }
 }
 
 module.exports = {
