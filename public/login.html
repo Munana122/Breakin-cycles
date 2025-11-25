@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login — Breaking Cycles</title>
+  <style>
+    /* Minimal extracted styles from your main page for consistent look */
+    * { box-sizing: border-box; margin:0; padding:0; }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.6;
+      color: #2c3e50;
+      background: linear-gradient(135deg,#f5f7fa 0%, #c3cfe2 100%);
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:2rem;
+    }
+
+    .card {
+      width:100%;
+      max-width:720px;
+      background:white;
+      border-radius:16px;
+      box-shadow:0 10px 30px rgba(0,0,0,0.08);
+      overflow:hidden;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .left {
+      padding:3rem;
+      background: linear-gradient(135deg,#667eea 0%, #764ba2 100%);
+      color:white;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      gap:1rem;
+    }
+    .left h1 { font-size:1.9rem; line-height:1.1; }
+    .left p { opacity:0.95; font-size:0.95rem; }
+
+    .right {
+      padding:2.5rem;
+    }
+    .section-title { font-size:1.5rem; margin-bottom:1rem; color:#2c3e50; font-weight:700; }
+
+    .form-group { margin-bottom:1rem; }
+    .form-group label { display:block; margin-bottom:0.5rem; font-weight:600; color:#2c3e50; }
+    .form-group input {
+      width:100%;
+      padding:0.9rem 1rem;
+      border-radius:10px;
+      border:2px solid #ecf0f1;
+      font-size:1rem;
+    }
+    .form-group input:focus { outline:none; border-color:#667eea; }
+
+    .btn-submit {
+      background: linear-gradient(135deg,#667eea,#764ba2);
+      color:white;
+      border:none;
+      padding:0.9rem 1rem;
+      border-radius:50px;
+      font-weight:600;
+      cursor:pointer;
+      width:100%;
+      margin-top:0.5rem;
+    }
+    .helper {
+      margin-top:0.75rem;
+      font-size:0.9rem;
+      color:#7f8c8d;
+    }
+    .link {
+      color:#667eea;
+      text-decoration:none;
+      font-weight:600;
+    }
+
+    .topbar {
+      position:fixed;
+      left:0; right:0; top:0;
+      display:flex;
+      justify-content:center;
+      padding:1rem 2rem;
+      pointer-events:none;
+    }
+    .brand {
+      pointer-events:all;
+      background:rgba(255,255,255,0.95);
+      padding:0.5rem 1rem;
+      border-radius:999px;
+      box-shadow:0 6px 20px rgba(0,0,0,0.06);
+      text-decoration:none;
+      color:#667eea;
+      font-weight:700;
+    }
+
+    @media (max-width:800px){
+      .card { grid-template-columns: 1fr; }
+      body { padding:1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar"><a class="brand" href="index.html">🌟 Breaking Cycles</a></div>
+
+  <main class="card" aria-labelledby="loginTitle" style="margin-top:48px;">
+    <section class="left" aria-hidden="false">
+      <h1>Welcome back</h1>
+      <p>Log in to access your courses, communities, and resources. We're glad to have you here — keep pushing forward.</p>
+      <p style="font-weight:700;">Not a member yet? <a href="signup.html" class="link" style="color:white; text-decoration:underline;">Create an account</a></p>
+    </section>
+
+    <section class="right" aria-labelledby="loginTitle">
+      <h2 id="loginTitle" class="section-title">Login</h2>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="loginEmail">Email Address *</label>
+          <input type="email" id="loginEmail" name="email" required placeholder="your.email@example.com" autocomplete="email">
+        </div>
+
+        <div class="form-group">
+          <label for="loginPassword">Password *</label>
+          <input type="password" id="loginPassword" name="password" required placeholder="Enter your password" autocomplete="current-password">
+        </div>
+
+        <button type="submit" class="btn-submit">🔑 Login</button>
+
+        <p class="helper">Forgot password? <a href="#" class="link">Reset it</a></p>
+      </form>
+
+      <div id="loginSuccess" style="display:none; margin-top:1rem; padding:0.75rem; border-radius:8px; background:#e9f7ef; color:#155724;">
+        ✅ Logged in (demo). Redirecting...
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // Basic demo handling for the login page — replace with your authentication logic
+    document.getElementById('loginForm').addEventListener('submit', function(e){
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+
+      if (!email || !password) {
+        alert('Please fill all fields.');
+        return;
+      }
+
+      console.log('Login submitted:', { email: email, password: password });
+      // Show demo success message
+      document.getElementById('loginSuccess').style.display = 'block';
+
+      // In a real app, authenticate on the server, then redirect to dashboard
+      setTimeout(() => {
+        window.location.href = 'dashboard.html' /* or index.html#dashboard */;
+      }, 1200);
+    });
+  </script>
+</body>
+</html>

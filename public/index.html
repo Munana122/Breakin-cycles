@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Breaking Cycles - Empowering Women Through Education</title>
     <style>
+        /* Global Styles */
         * {
             margin: 0;
             padding: 0;
@@ -18,7 +19,7 @@
             overflow-x: hidden;
         }
 
-        /* Navigation */
+        /* Navigation Styles */
         nav {
             position: fixed;
             top: 0;
@@ -41,7 +42,6 @@
             justify-content: space-between;
             align-items: center;
             padding: 1rem 2rem;
-            position: relative;
         }
 
         .logo {
@@ -142,7 +142,7 @@
             color: #667eea;
         }
 
-        /* Sections */
+        /* Section Styles */
         .section {
             min-height: 100vh;
             padding: 100px 0 50px 0;
@@ -163,32 +163,15 @@
             font-weight: 700;
         }
 
-        /* HOME SECTION */
+        /* Home Section Styles */
         .home-section {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
             color: white;
             text-align: center;
             position: relative;
-        }
-
-        .home-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="a" cx="50%" cy="50%"><stop offset="0%" style="stop-color:rgba(255,255,255,0.1)"/><stop offset="100%" style="stop-color:rgba(255,255,255,0)"/></radialGradient></defs><circle cx="200" cy="200" r="100" fill="url(%23a)" opacity="0.5"><animate attributeName="r" values="50;120;50" dur="4s" repeatCount="indefinite"/></circle><circle cx="800" cy="300" r="80" fill="url(%23a)" opacity="0.3"><animate attributeName="r" values="40;100;40" dur="6s" repeatCount="indefinite"/></circle><circle cx="300" cy="700" r="90" fill="url(%23a)" opacity="0.4"><animate attributeName="r" values="60;110;60" dur="5s" repeatCount="indefinite"/></circle></svg>') center/cover;
-            animation: float 20s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(2deg); }
         }
 
         .hero-content {
@@ -202,7 +185,6 @@
             margin-bottom: 1.5rem;
             font-weight: 800;
             line-height: 1.2;
-            animation: fadeInUp 1s ease 0.2s both;
         }
 
         .mission-statement {
@@ -210,18 +192,6 @@
             margin-bottom: 3rem;
             opacity: 0.95;
             font-weight: 300;
-            animation: fadeInUp 1s ease 0.4s both;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
         }
 
         .cta-buttons {
@@ -229,7 +199,6 @@
             gap: 1.5rem;
             justify-content: center;
             flex-wrap: wrap;
-            animation: fadeInUp 1s ease 0.6s both;
         }
 
         .btn {
@@ -244,8 +213,6 @@
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            position: relative;
-            overflow: hidden;
         }
 
         .btn-primary {
@@ -283,7 +250,7 @@
             transform: translateY(-2px);
         }
 
-        /* LEARN SECTION */
+        /* Learn Section */
         .learn-section {
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
         }
@@ -302,11 +269,6 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             transition: all 0.3s ease;
             overflow: hidden;
-        }
-
-        .category-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
         }
 
         .category-header {
@@ -352,11 +314,6 @@
             cursor: pointer;
         }
 
-        .course-item:hover {
-            background: #e9ecef;
-            transform: translateX(5px);
-        }
-
         .course-icon {
             width: 40px;
             height: 40px;
@@ -380,15 +337,7 @@
             font-size: 0.9rem;
         }
 
-        .course-stats {
-            display: flex;
-            gap: 1rem;
-            font-size: 0.8rem;
-            color: #95a5a6;
-            margin-top: 0.3rem;
-        }
-
-        /* COMMUNITY SECTION */
+        /* Community Section */
         .community-section {
             background: white;
         }
@@ -408,21 +357,6 @@
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
-        }
-
-        .group-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-        }
-
-        .group-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
         }
 
         .group-header {
@@ -450,44 +384,15 @@
             margin-bottom: 0.5rem;
         }
 
-        .group-stats {
-            display: flex;
-            gap: 1rem;
-            font-size: 0.9rem;
-            color: #7f8c8d;
-        }
-
         .group-description {
             color: #5a6c7d;
             margin-bottom: 1.5rem;
             line-height: 1.7;
         }
 
-        .group-features {
-            list-style: none;
-            margin-bottom: 2rem;
-        }
-
-        .group-features li {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 0.5rem;
-            color: #5a6c7d;
-        }
-
-        .group-features li::before {
-            content: '✅';
-            font-size: 0.9rem;
-        }
-
-        /* STORIES SECTION */
+        /* Stories Section */
         .stories-section {
             background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-            color: white;
-        }
-
-        .stories-section .section-title {
             color: white;
         }
 
@@ -507,58 +412,7 @@
             transition: all 0.3s ease;
         }
 
-        .story-card:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateY(-5px);
-        }
-
-        .story-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .story-avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .story-name {
-            font-size: 1.3rem;
-            font-weight: 700;
-            margin-bottom: 0.3rem;
-        }
-
-        .story-tagline {
-            opacity: 0.8;
-            font-size: 0.9rem;
-            font-style: italic;
-        }
-
-        .story-quote {
-            font-size: 1rem;
-            font-style: italic;
-            margin-bottom: 1rem;
-            padding-left: 1rem;
-            border-left: 3px solid rgba(255, 255, 255, 0.3);
-            opacity: 0.9;
-        }
-
-        .story-text {
-            opacity: 0.8;
-            line-height: 1.6;
-            margin-bottom: 1.5rem;
-        }
-
-        /* CONTACT SECTION */
+        /* Contact Section */
         .contact-section {
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
         }
@@ -591,31 +445,6 @@
             margin: 0 auto 2rem;
             border: 5px solid white;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-
-        .founder-info h3 {
-            color: #2c3e50;
-            font-size: 1.8rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .founder-title {
-            color: #667eea;
-            font-size: 1.1rem;
-            margin-bottom: 1.5rem;
-            font-weight: 600;
-        }
-
-        .contact-details {
-            text-align: left;
-        }
-
-        .contact-item {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1rem;
-            color: #5a6c7d;
         }
 
         .contact-form {
@@ -652,11 +481,6 @@
             border-color: #667eea;
         }
 
-        .form-group textarea {
-            resize: vertical;
-            min-height: 120px;
-        }
-
         .btn-submit {
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
@@ -685,30 +509,46 @@
             border: 1px solid #c3e6cb;
         }
 
-        /* Stats Section */
-        .stats-section {
-            padding: 4rem 0;
-            background: #2c3e50;
-            color: white;
+        /* Dashboard Section */
+        .dashboard-section {
+            background: #f5f5f5;
+            padding: 50px 0;
         }
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 2rem;
+        .dashboard-title {
             text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            color: #2c3e50;
         }
 
-        .stat-item h3 {
-            font-size: 3rem;
-            color: #667eea;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 0 2rem;
         }
 
-        .stat-item p {
-            font-size: 1.1rem;
-            opacity: 0.9;
+        .dashboard-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .dashboard-card h4 {
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+
+        .dashboard-card p {
+            color: #7f8c8d;
         }
 
         /* Responsive Design */
@@ -736,7 +576,8 @@
 
             .learn-grid,
             .community-grid,
-            .stories-grid {
+            .stories-grid,
+            .dashboard-grid {
                 grid-template-columns: 1fr;
             }
 
@@ -744,17 +585,9 @@
                 grid-template-columns: 1fr;
                 gap: 2rem;
             }
-
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .section {
-                padding: 80px 0 30px 0;
-            }
         }
 
-        /* Smooth scrolling */
+        /* Smooth Scrolling */
         html {
             scroll-behavior: smooth;
         }
@@ -766,239 +599,6 @@
 
         .section.active {
             display: block;
-        }
-
-        /* Chat Room Modal */
-        .chat-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-            padding: 1rem;
-        }
-
-        .chat-modal.active {
-            display: flex;
-        }
-
-        .chat-container {
-            background: white;
-            border-radius: 20px;
-            width: 100%;
-            max-width: 800px;
-            max-height: 90vh;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            animation: slideUp 0.3s ease;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .chat-header {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            padding: 1.5rem 2rem;
-            border-radius: 20px 20px 0 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .chat-header-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .chat-room-icon {
-            font-size: 2rem;
-        }
-
-        .chat-room-name h3 {
-            font-size: 1.3rem;
-            margin-bottom: 0.3rem;
-        }
-
-        .chat-room-status {
-            font-size: 0.9rem;
-            opacity: 0.9;
-        }
-
-        .close-chat {
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            color: white;
-            font-size: 1.5rem;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-
-        .close-chat:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: rotate(90deg);
-        }
-
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 2rem;
-            background: #f8f9fa;
-        }
-
-        .chat-message {
-            display: flex;
-            align-items: flex-start;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .message-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-            font-size: 0.9rem;
-            flex-shrink: 0;
-        }
-
-        .message-content {
-            flex: 1;
-        }
-
-        .message-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .message-author {
-            font-weight: 600;
-            color: #2c3e50;
-        }
-
-        .message-time {
-            font-size: 0.8rem;
-            color: #7f8c8d;
-        }
-
-        .message-text {
-            color: #5a6c7d;
-            line-height: 1.6;
-            background: white;
-            padding: 1rem;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-
-        .chat-input-container {
-            padding: 1.5rem 2rem;
-            background: white;
-            border-top: 1px solid #ecf0f1;
-            border-radius: 0 0 20px 20px;
-        }
-
-        .chat-input-wrapper {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-        }
-
-        .chat-input-wrapper input {
-            flex: 1;
-            padding: 1rem;
-            border: 2px solid #ecf0f1;
-            border-radius: 25px;
-            font-size: 1rem;
-            transition: border-color 0.3s ease;
-        }
-
-        .chat-input-wrapper input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .send-btn {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            font-size: 1.2rem;
-        }
-
-        .send-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
-        }
-
-        /* Responsive Chat */
-        @media (max-width: 768px) {
-            .chat-container {
-                max-height: 95vh;
-                border-radius: 10px;
-            }
-
-            .chat-header {
-                padding: 1rem;
-                border-radius: 10px 10px 0 0;
-            }
-
-            .chat-room-icon {
-                font-size: 1.5rem;
-            }
-
-            .chat-room-name h3 {
-                font-size: 1.1rem;
-            }
-
-            .chat-messages {
-                padding: 1rem;
-            }
-
-            .chat-input-container {
-                padding: 1rem;
-                border-radius: 0 0 10px 10px;
-            }
         }
     </style>
 </head>
@@ -1013,6 +613,9 @@
                 <li><a href="#community" class="nav-link" onclick="showSection('community')">Community</a></li>
                 <li><a href="#stories" class="nav-link" onclick="showSection('stories')">Stories</a></li>
                 <li><a href="#contact" class="nav-link" onclick="showSection('contact')">Contact</a></li>
+                <li><a href="#dashboard" class="nav-link" onclick="showSection('dashboard')">Dashboard</a></li>
+                <li><a href="login.html" class="nav-link">Login</a></li>
+                <li><a href="signup.html" class="nav-link">Sign Up</a></li>
             </ul>
             <div class="mobile-menu-toggle" onclick="toggleMobileMenu()">
                 <span></span>
@@ -1026,6 +629,7 @@
             <a href="#community" onclick="showSection('community'); closeMobileMenu()">Community</a>
             <a href="#stories" onclick="showSection('stories'); closeMobileMenu()">Stories</a>
             <a href="#contact" onclick="showSection('contact'); closeMobileMenu()">Contact</a>
+            <a href="#dashboard" onclick="showSection('dashboard'); closeMobileMenu()">Dashboard</a>
         </div>
     </nav>
 
@@ -1252,25 +856,29 @@
                 </div>
             </div>
 
-            <!-- Stats Section -->
-            <div class="stats-section" style="border-radius: 30px; margin-top: 4rem;">
-                <div class="container">
-                    <div class="stats-grid">
-                        <div class="stat-item">
-                            <h3 id="stat1">0</h3>
-                            <p>Women Empowered</p>
+            <!-- Paid Courses Section -->
+            <div class="container">
+                <h2 class="section-title">Paid Courses</h2>
+                <div class="learn-grid">
+                    <div class="category-card">
+                        <div class="category-header">
+                            <div class="category-icon">📚</div>
+                            <h3>Khan Academy</h3>
                         </div>
-                        <div class="stat-item">
-                            <h3 id="stat2">0</h3>
-                            <p>Skills Learned</p>
+                        <div class="category-content">
+                            <p>Access a wide range of courses for free, including math, science, economics, and more.</p>
+                            <a href="https://www.khanacademy.org" class="btn btn-primary" style="width: 100%;">Visit Khan Academy</a>
                         </div>
-                        <div class="stat-item">
-                            <h3 id="stat3">0</h3>
-                            <p>Success Stories</p>
+                    </div>
+
+                    <div class="category-card">
+                        <div class="category-header">
+                            <div class="category-icon">🎓</div>
+                            <h3>Coursera</h3>
                         </div>
-                        <div class="stat-item">
-                            <h3 id="stat4">0</h3>
-                            <p>Communities</p>
+                        <div class="category-content">
+                            <p>Enroll in courses from top universities and organizations worldwide.</p>
+                            <a href="https://www.coursera.org" class="btn btn-primary" style="width: 100%;">Visit Coursera</a>
                         </div>
                     </div>
                 </div>
@@ -1442,6 +1050,79 @@
         </div>
     </section>
 
+    <!-- LOGIN SECTION -->
+    <section id="login" class="section">
+        <div class="container">
+            <h2 class="section-title">Login</h2>
+            <div class="contact-form">
+                <form id="loginForm" onsubmit="submitLogin(event)">
+                    <div class="form-group">
+                        <label for="loginEmail">Email Address *</label>
+                        <input type="email" id="loginEmail" name="email" required placeholder="your.email@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password *</label>
+                        <input type="password" id="loginPassword" name="password" required placeholder="Enter your password">
+                    </div>
+                    <button type="submit" class="btn-submit">🔑 Login</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- SIGNUP SECTION -->
+    <section id="signup" class="section">
+        <div class="container">
+            <h2 class="section-title">Sign Up</h2>
+            <div class="contact-form">
+                <form id="signupForm" onsubmit="submitSignup(event)">
+                    <div class="form-group">
+                        <label for="signupName">Your Name *</label>
+                        <input type="text" id="signupName" name="name" required placeholder="Enter your full name">
+                    </div>
+                    <div class="form-group">
+                        <label for="signupEmail">Email Address *</label>
+                        <input type="email" id="signupEmail" name="email" required placeholder="your.email@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="signupPassword">Password *</label>
+                        <input type="password" id="signupPassword" name="password" required placeholder="Create a password">
+                    </div>
+                    <button type="submit" class="btn-submit">🎉 Sign Up</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- DASHBOARD SECTION -->
+    <section id="dashboard" class="section dashboard-section">
+        <div class="container">
+            <h2 class="dashboard-title">Your Dashboard</h2>
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <h4>Your Courses</h4>
+                    <p>View and manage your enrolled courses.</p>
+                    <a href="#learn" class="btn btn-primary" style="width: 100%;">View Courses</a>
+                </div>
+                <div class="dashboard-card">
+                    <h4>Community Chats</h4>
+                    <p>Join discussions and connect with other members.</p>
+                    <a href="#community" class="btn btn-primary" style="width: 100%;">Join Community</a>
+                </div>
+                <div class="dashboard-card">
+                    <h4>Success Stories</h4>
+                    <p>Share your journey and read others' stories.</p>
+                    <a href="#stories" class="btn btn-primary" style="width: 100%;">Read Stories</a>
+                </div>
+                <div class="dashboard-card">
+                    <h4>Resources</h4>
+                    <p>Access helpful materials and links.</p>
+                    <a href="#resources" class="btn btn-primary" style="width: 100%;">View Resources</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- CONTACT SECTION -->
     <section id="contact" class="section contact-section">
         <div class="container">
@@ -1515,49 +1196,7 @@
             </div>
             
             <div class="chat-messages" id="chatMessages">
-                <div class="chat-message">
-                    <div class="message-avatar">AM</div>
-                    <div class="message-content">
-                        <div class="message-header">
-                            <span class="message-author">Aisha M.</span>
-                            <span class="message-time">2 hours ago</span>
-                        </div>
-                        <p class="message-text">Just wanted to share - I finally submitted my college application today! It took months of studying while my little one napped, but we did it! 💪✨</p>
-                    </div>
-                </div>
-
-                <div class="chat-message">
-                    <div class="message-avatar">SL</div>
-                    <div class="message-content">
-                        <div class="message-header">
-                            <span class="message-author">Sarah L.</span>
-                            <span class="message-time">1 hour ago</span>
-                        </div>
-                        <p class="message-text">@Aisha That's incredible! You're such an inspiration. I'm still working up the courage to start my coding course. How do you manage study time?</p>
-                    </div>
-                </div>
-
-                <div class="chat-message">
-                    <div class="message-avatar">RK</div>
-                    <div class="message-content">
-                        <div class="message-header">
-                            <span class="message-author">Rose K.</span>
-                            <span class="message-time">45 min ago</span>
-                        </div>
-                        <p class="message-text">Ladies, I found an amazing free childcare resource for study sessions! Sharing the link in our resources channel. We've got this! 🌟</p>
-                    </div>
-                </div>
-
-                <div class="chat-message">
-                    <div class="message-avatar">MM</div>
-                    <div class="message-content">
-                        <div class="message-header">
-                            <span class="message-author">Munana M. (Founder)</span>
-                            <span class="message-time">30 min ago</span>
-                        </div>
-                        <p class="message-text">So proud of this community! Remember, every small step counts. You're not just changing your life - you're changing your children's future too. Keep going! 💜</p>
-                    </div>
-                </div>
+                <!-- Messages will be dynamically populated here -->
             </div>
             
             <div class="chat-input-container">
@@ -1719,17 +1358,6 @@
             
             // Scroll to top
             window.scrollTo(0, 0);
-            
-            // Animate stats if on learn section
-            if (sectionId === 'learn' && !window.statsAnimated) {
-                setTimeout(() => {
-                    animateCounter('stat1', 1250, 2000);
-                    animateCounter('stat2', 3800, 2200);
-                    animateCounter('stat3', 450, 1800);
-                    animateCounter('stat4', 25, 1500);
-                    window.statsAnimated = true;
-                }, 300);
-            }
         }
 
         // Mobile Menu Toggle
@@ -1752,24 +1380,6 @@
             }
         });
 
-        // Animated counters
-        function animateCounter(id, target, duration) {
-            const element = document.getElementById(id);
-            let start = 0;
-            const increment = target / (duration / 16);
-            
-            function updateCounter() {
-                start += increment;
-                if (start < target) {
-                    element.textContent = Math.floor(start).toLocaleString();
-                    requestAnimationFrame(updateCounter);
-                } else {
-                    element.textContent = target.toLocaleString();
-                }
-            }
-            updateCounter();
-        }
-
         // Contact Form Submission
         function submitContact(event) {
             event.preventDefault();
@@ -1785,6 +1395,27 @@
             setTimeout(() => {
                 document.getElementById('contactSuccessMessage').style.display = 'none';
             }, 5000);
+        }
+
+        // Login Form Submission
+        function submitLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            console.log('Login submitted:', { email, password });
+            // Here, you would typically handle authentication logic
+        }
+
+        // Signup Form Submission
+        function submitSignup(event) {
+            event.preventDefault();
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+
+            console.log('Signup submitted:', { name, email, password });
+            // Here, you would typically handle user registration logic
         }
 
         // Smooth scrolling for all links
@@ -1808,9 +1439,7 @@
                 }, index * 150);
             });
         });
-
-        // Initialize stats animation flag
-        window.statsAnimated = false;
     </script>
 </body>
 </html>
+
