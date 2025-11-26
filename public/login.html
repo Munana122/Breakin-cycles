@@ -141,8 +141,7 @@
   </main>
 
   <script>
-    // Basic demo handling for the login page — replace with your authentication logic
-    document.getElementById('loginForm').addEventListener('submit', function(e){
+    document.getElementById('loginForm').addEventListener('submit', async function(e){
       e.preventDefault();
       const email = document.getElementById('loginEmail').value.trim();
       const password = document.getElementById('loginPassword').value;
@@ -152,14 +151,44 @@
         return;
       }
 
-      console.log('Login submitted:', { email: email, password: password });
-      // Show demo success message
-      document.getElementById('loginSuccess').style.display = 'block';
+      console.log('Attempting login with:', { email, password: '***' });
+      
+      try {
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email, password })
+        });
 
-      // In a real app, authenticate on the server, then redirect to dashboard
-      setTimeout(() => {
-        window.location.href = 'dashboard.html' /* or index.html#dashboard */;
-      }, 1200);
+        console.log('Response status:', response.status);
+        const data = await response.json();
+        console.log('Response data:', data);
+
+        if (response.ok) {
+          // Store the token
+          localStorage.setItem('authToken', data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
+          
+          // Show success message
+          document.getElementById('loginSuccess').style.display = 'block';
+          
+          // Redirect to dashboard
+          setTimeout(() => {
+            window.location.href = 'dashboard.html';
+          }, 1200);
+        } else {
+          if (data.requiresVerification) {
+            alert(data.error + '\n\nPlease check your email and verify your account first.');
+          } else {
+            alert(data.error || 'Login failed');
+          }
+        }
+      } catch (error) {
+        console.error('Login error:', error);
+        alert('Network error. Please check if server is running.');
+      }
     });
   </script>
 </body>

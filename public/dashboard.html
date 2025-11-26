@@ -1,0 +1,1596 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard — Breaking Cycles</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.6;
+      color: #2c3e50;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+    }
+    
+    .header {
+      background: white;
+      padding: 1rem 2rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .brand {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #667eea;
+      text-decoration: none;
+    }
+    
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .profile-btn {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-right: 0.5rem;
+    }
+    
+    .logout-btn {
+      background: #e74c3c;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+    }
+    
+    .welcome {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+      margin-bottom: 2rem;
+    }
+    
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+    
+    .card {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    }
+    
+    .card h3 {
+      color: #667eea;
+      margin-bottom: 1rem;
+    }
+    
+    .btn {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 1rem;
+    }
+    
+    .profile-section {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+    
+    .profile-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 2rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .profile-avatar:hover {
+      transform: scale(1.05);
+    }
+    
+    .profile-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+    
+    .profile-greeting h1 {
+      margin: 0;
+      color: #2c3e50;
+    }
+    
+    .settings-btn, .notification-btn {
+      background: #95a5a6;
+      color: white;
+      border: none;
+      padding: 0.5rem;
+      border-radius: 50%;
+      cursor: pointer;
+      margin-left: 0.5rem;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+    
+    .notification-btn {
+      background: #f39c12;
+    }
+    
+    .profile-avatar-small {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      margin-left: 0.5rem;
+      transition: transform 0.2s ease;
+    }
+    
+    .profile-avatar-small:hover {
+      transform: scale(1.05);
+    }
+    
+    .profile-avatar-small img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+    
+    .settings-sidebar {
+      position: fixed;
+      top: 0;
+      right: -350px;
+      width: 350px;
+      height: 100vh;
+      background: white;
+      box-shadow: -2px 0 20px rgba(0,0,0,0.15);
+      transition: right 0.3s ease;
+      z-index: 1000;
+      overflow-y: auto;
+    }
+    
+    .settings-sidebar.active {
+      right: 0;
+    }
+    
+    .settings-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+    }
+    
+    .settings-header h3 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin: 0;
+    }
+    
+    .close-settings {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+    
+    .settings-content {
+      padding: 0;
+    }
+    
+    .setting-item {
+      display: flex;
+      align-items: center;
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid #f0f0f0;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    
+    .setting-item:hover {
+      background-color: #f8f9fa;
+    }
+    
+    .setting-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 1rem;
+      font-size: 1.2rem;
+    }
+    
+    .setting-content {
+      flex: 1;
+    }
+    
+    .setting-title {
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 0.2rem;
+      font-size: 0.95rem;
+    }
+    
+    .setting-description {
+      color: #6c757d;
+      font-size: 0.8rem;
+    }
+    
+    .setting-arrow {
+      color: #adb5bd;
+      font-size: 1rem;
+    }
+    
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(135deg, #5a6fd8, #6a42a0);
+    }
+    
+    /* Firefox */
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: #667eea #f1f1f1;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <a href="#" class="brand">🌟 Breaking Cycles</a>
+    <div class="user-info">
+      <span id="userName">Welcome!</span>
+      <button class="notification-btn" onclick="showNotifications()">🔔</button>
+      <button class="settings-btn" onclick="toggleSettings()">⚙️</button>
+      <div class="profile-avatar-small" id="profileAvatarSmall" onclick="showProfile()">
+        <span id="avatarTextSmall">U</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Settings Sidebar -->
+  <div class="settings-sidebar" id="settingsSidebar">
+    <div class="settings-header">
+      <h3>Settings</h3>
+      <button class="close-settings" onclick="toggleSettings()">✕</button>
+    </div>
+    <div class="settings-content" id="settings-main">
+      <div class="setting-item" onclick="showSettingsDetail('account')">
+        <div class="setting-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">🔒</div>
+        <div class="setting-content">
+          <div class="setting-title">Account</div>
+          <div class="setting-description">Everything related to your personal profile and login</div>
+        </div>
+        <div class="setting-arrow">›</div>
+      </div>
+      
+      <div class="setting-item" onclick="showSettingsDetail('courses')">
+        <div class="setting-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">📚</div>
+        <div class="setting-content">
+          <div class="setting-title">Courses</div>
+          <div class="setting-description">Manage your enrolled courses and preferences</div>
+        </div>
+        <div class="setting-arrow">›</div>
+      </div>
+      
+      <div class="setting-item" onclick="showSettingsDetail('community')">
+        <div class="setting-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">👥</div>
+        <div class="setting-content">
+          <div class="setting-title">Community</div>
+          <div class="setting-description">Manage chat rooms and social preferences</div>
+        </div>
+        <div class="setting-arrow">›</div>
+      </div>
+      
+      <div class="setting-item" onclick="showSettingsDetail('notifications')">
+        <div class="setting-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">🔔</div>
+        <div class="setting-content">
+          <div class="setting-title">Notifications</div>
+          <div class="setting-description">Control how you receive updates and alerts</div>
+        </div>
+        <div class="setting-arrow">›</div>
+      </div>
+      
+      <div class="setting-item" onclick="showSettingsDetail('privacy')">
+        <div class="setting-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">🛡️</div>
+        <div class="setting-content">
+          <div class="setting-title">Privacy & Security</div>
+          <div class="setting-description">Control your privacy and security settings</div>
+        </div>
+        <div class="setting-arrow">›</div>
+      </div>
+      
+      <div class="setting-item" onclick="showSettingsDetail('appearance')">
+        <div class="setting-icon" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">🎨</div>
+        <div class="setting-content">
+          <div class="setting-title">Appearance</div>
+          <div class="setting-description">Customize the look and feel of your interface</div>
+        </div>
+        <div class="setting-arrow">›</div>
+      </div>
+      
+      <div class="setting-item" onclick="showSettingsDetail('about')">
+        <div class="setting-icon" style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);">ℹ️</div>
+        <div class="setting-content">
+          <div class="setting-title">About</div>
+          <div class="setting-description">App information, support, and legal documents</div>
+        </div>
+        <div class="setting-arrow">›</div>
+      </div>
+      
+      <div class="setting-item" onclick="showSettingsDetail('actions')">
+        <div class="setting-icon" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);">⚠️</div>
+        <div class="setting-content">
+          <div class="setting-title">Account Actions</div>
+          <div class="setting-description">Logout or delete your account permanently</div>
+        </div>
+        <div class="setting-arrow">›</div>
+      </div>
+    </div>
+
+    <!-- Settings Detail Views -->
+    <div class="settings-detail" id="account-settings" style="display: none; padding: 1.5rem;">
+      <div class="settings-header" style="background: none; padding: 0 0 1rem 0; color: #2c3e50;">
+        <button class="back-btn" onclick="showSettingsMain()" style="background: none; border: none; color: #667eea; font-size: 1.2rem; cursor: pointer;">‹ Back</button>
+        <h3 style="margin: 0.5rem 0;">Account Settings</h3>
+      </div>
+      
+      <div class="setting-section" style="margin-bottom: 2rem;">
+        <h4 style="color: #667eea; margin-bottom: 1rem;">Edit Profile</h4>
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Profile Picture</label>
+          <div class="profile-pic-upload" style="display: flex; align-items: center; gap: 1rem;">
+            <img src="https://via.placeholder.com/60" alt="Profile" id="profile-preview" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover;">
+            <input type="file" id="profile-pic" accept="image/*" style="display: none;">
+            <button onclick="document.getElementById('profile-pic').click()" style="padding: 0.5rem 1rem; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">Change Picture</button>
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Full Name</label>
+          <input type="text" id="full-name" placeholder="Enter your full name" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;">
+        </div>
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Email</label>
+          <input type="email" id="email" placeholder="Enter your email" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;">
+        </div>
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Phone Number</label>
+          <input type="tel" id="phone" placeholder="Enter your phone number" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;">
+        </div>
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Username</label>
+          <input type="text" id="username" placeholder="Enter your username" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;">
+        </div>
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Bio</label>
+          <textarea id="bio" placeholder="Tell us about yourself" rows="3" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px; resize: vertical;"></textarea>
+        </div>
+      </div>
+
+      <div class="setting-section" style="margin-bottom: 2rem;">
+        <h4 style="color: #667eea; margin-bottom: 1rem;">Change Password</h4>
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Current Password</label>
+          <input type="password" id="current-password" placeholder="Enter current password" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;">
+        </div>
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">New Password</label>
+          <input type="password" id="new-password" placeholder="Enter new password" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;">
+        </div>
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Confirm New Password</label>
+          <input type="password" id="confirm-password" placeholder="Confirm new password" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;">
+        </div>
+      </div>
+
+      <div class="setting-section" style="margin-bottom: 2rem;">
+        <h4 style="color: #667eea; margin-bottom: 1rem;">Connected Accounts</h4>
+        <div class="connected-account" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #f8f9fa; border-radius: 8px; margin-bottom: 0.5rem;">
+          <span id="google-status">🔗 Google</span>
+          <button class="link-btn" id="google-btn" onclick="linkGoogle()" style="padding: 0.5rem 1rem; background: #4285f4; color: white; border: none; border-radius: 5px; cursor: pointer;">Link Account</button>
+        </div>
+        <div class="connected-account" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #f8f9fa; border-radius: 8px; margin-bottom: 0.5rem;">
+          <span id="facebook-status">📘 Facebook</span>
+          <button class="link-btn" id="facebook-btn" onclick="linkFacebook()" style="padding: 0.5rem 1rem; background: #1877f2; color: white; border: none; border-radius: 5px; cursor: pointer;">Link Account</button>
+        </div>
+        <div class="connected-account" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #f8f9fa; border-radius: 8px; margin-bottom: 0.5rem;">
+          <span id="github-status">🐙 GitHub</span>
+          <button class="link-btn" id="github-btn" onclick="linkGitHub()" style="padding: 0.5rem 1rem; background: #333; color: white; border: none; border-radius: 5px; cursor: pointer;">Link Account</button>
+        </div>
+      </div>
+
+      <button class="save-btn" onclick="saveAccountSettings()" style="width: 100%; padding: 1rem; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">Save Changes</button>
+    </div>
+
+    <!-- Other settings details would go here -->
+    <!-- Courses Settings -->
+    <div class="settings-detail" id="courses-settings" style="display: none; padding: 1.5rem;">
+      <div class="settings-header" style="background: none; padding: 0 0 1rem 0; color: #2c3e50;">
+        <button class="back-btn" onclick="showSettingsMain()" style="background: none; border: none; color: #667eea; font-size: 1.2rem; cursor: pointer;">‹ Back</button>
+        <h3 style="margin: 0.5rem 0;">📚 Courses</h3>
+      </div>
+      
+      <div style="background: #f8f9fa; border-radius: 12px; padding: 1rem; margin-bottom: 1rem;">
+        <h4 style="color: #667eea; margin-bottom: 1rem;">Enrolled Courses</h4>
+        <div id="enrolled-courses-list"></div>
+      </div>
+
+      <div style="background: #f0f8ff; border-radius: 12px; padding: 1rem; margin-bottom: 1rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <div><strong>Auto-Enroll Suggestions</strong><br><small style="color: #6c757d;">Get recommendations based on activity</small></div>
+          <label style="position: relative; display: inline-block; width: 50px; height: 24px;"><input type="checkbox" style="opacity: 0; width: 0; height: 0;"><span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, #667eea, #764ba2); transition: .4s; border-radius: 24px;"></span></label>
+        </div>
+        
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Learning Mode</label>
+          <select style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 8px; background: white;">
+            <option>Standard - Regular pace</option>
+            <option>Focus Mode - Distraction-free</option>
+            <option>Audio-First - Perfect for multitasking</option>
+          </select>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div><strong>Progress Backup</strong><br><small style="color: #6c757d;">Sync to cloud</small></div>
+          <label style="position: relative; display: inline-block; width: 50px; height: 24px;"><input type="checkbox" checked style="opacity: 0; width: 0; height: 0;"><span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, #43e97b, #38f9d7); transition: .4s; border-radius: 24px;"></span></label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Community Settings -->
+    <div class="settings-detail" id="community-settings" style="display: none; padding: 1.5rem;">
+      <div class="settings-header" style="background: none; padding: 0 0 1rem 0; color: #2c3e50;">
+        <button class="back-btn" onclick="showSettingsMain()" style="background: none; border: none; color: #667eea; font-size: 1.2rem; cursor: pointer;">‹ Back</button>
+        <h3 style="margin: 0.5rem 0;">👥 Community</h3>
+      </div>
+      
+      <div style="background: #f8f9fa; border-radius: 12px; padding: 1rem; margin-bottom: 1rem;">
+        <h4 style="color: #667eea; margin-bottom: 1rem;">Chat Rooms</h4>
+        <div style="background: white; border-radius: 8px; padding: 0.75rem; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+          <span>👩‍👧‍👦 Young Mothers Circle</span>
+          <label style="position: relative; display: inline-block; width: 40px; height: 20px;"><input type="checkbox" checked style="opacity: 0; width: 0; height: 0;"><span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, #43e97b, #38f9d7); transition: .4s; border-radius: 20px;"></span></label>
+        </div>
+        <div style="background: white; border-radius: 8px; padding: 0.75rem; display: flex; justify-content: space-between; align-items: center;">
+          <span>♿ Empowered Abilities</span>
+          <label style="position: relative; display: inline-block; width: 40px; height: 20px;"><input type="checkbox" style="opacity: 0; width: 0; height: 0;"><span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 20px;"></span></label>
+        </div>
+      </div>
+
+      <div style="background: #f0f8ff; border-radius: 12px; padding: 1rem; margin-bottom: 1rem;">
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Allow DMs From</label>
+          <select style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 8px; background: white;">
+            <option>Everyone</option>
+            <option>Only People I Follow</option>
+            <option>No One</option>
+          </select>
+        </div>
+        
+        <div>
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Post Visibility</label>
+          <select style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 8px; background: white;">
+            <option>Public</option>
+            <option>Followers Only</option>
+            <option>Private</option>
+          </select>
+        </div>
+      </div>
+      
+      <div style="background: #fff5f5; border: 1px solid #fed7d7; border-radius: 12px; padding: 1rem;">
+        <h5 style="margin: 0 0 0.5rem 0; color: #e53e3e;">Block List</h5>
+        <p style="color: #6c757d; margin: 0 0 1rem 0;">No blocked users</p>
+        <button onclick="alert('Block list management')" style="padding: 0.5rem 1rem; background: #e53e3e; color: white; border: none; border-radius: 6px; cursor: pointer;">Manage</button>
+      </div>
+    </div>
+
+    <!-- Notifications Settings -->
+    <div class="settings-detail" id="notifications-settings" style="display: none; padding: 1.5rem;">
+      <div class="settings-header" style="background: none; padding: 0 0 1rem 0; color: #2c3e50;">
+        <button class="back-btn" onclick="showSettingsMain()" style="background: none; border: none; color: #667eea; font-size: 1.2rem; cursor: pointer;">‹ Back</button>
+        <h3 style="margin: 0.5rem 0;">🔔 Notifications</h3>
+      </div>
+      
+      <div style="background: #f8f9fa; border-radius: 12px; padding: 1rem; margin-bottom: 1rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <div><strong>Email Notifications</strong><br><small style="color: #6c757d;">Receive updates via email</small></div>
+          <label style="position: relative; display: inline-block; width: 50px; height: 24px;"><input type="checkbox" checked style="opacity: 0; width: 0; height: 0;"><span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, #667eea, #764ba2); transition: .4s; border-radius: 24px;"></span></label>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div><strong>Push Notifications</strong><br><small style="color: #6c757d;">Device notifications</small></div>
+          <label style="position: relative; display: inline-block; width: 50px; height: 24px;"><input type="checkbox" checked style="opacity: 0; width: 0; height: 0;"><span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, #667eea, #764ba2); transition: .4s; border-radius: 24px;"></span></label>
+        </div>
+      </div>
+
+      <div style="background: #f0f8ff; border-radius: 12px; padding: 1rem; margin-bottom: 1rem;">
+        <h4 style="color: #667eea; margin-bottom: 1rem;">Course Alerts</h4>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0;">
+          <span>New assignments</span>
+          <label style="position: relative; display: inline-block; width: 40px; height: 20px;"><input type="checkbox" checked style="opacity: 0; width: 0; height: 0;"><span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, #4facfe, #00f2fe); transition: .4s; border-radius: 20px;"></span></label>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0;">
+          <span>Upcoming deadlines</span>
+          <label style="position: relative; display: inline-block; width: 40px; height: 20px;"><input type="checkbox" checked style="opacity: 0; width: 0; height: 0;"><span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, #4facfe, #00f2fe); transition: .4s; border-radius: 20px;"></span></label>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0;">
+          <span>New course releases</span>
+          <label style="position: relative; display: inline-block; width: 40px; height: 20px;"><input type="checkbox" style="opacity: 0; width: 0; height: 0;"><span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 20px;"></span></label>
+        </div>
+      </div>
+
+      <div style="background: #f0fff0; border-radius: 12px; padding: 1rem; margin-bottom: 1rem;">
+        <h4 style="color: #667eea; margin-bottom: 1rem;">Community Alerts</h4>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0;">
+          <span>Replies to posts</span>
+          <label style="position: relative; display: inline-block; width: 40px; height: 20px;"><input type="checkbox" checked style="opacity: 0; width: 0; height: 0;"><span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, #43e97b, #38f9d7); transition: .4s; border-radius: 20px;"></span></label>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0;">
+          <span>Mentions</span>
+          <label style="position: relative; display: inline-block; width: 40px; height: 20px;"><input type="checkbox" checked style="opacity: 0; width: 0; height: 0;"><span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, #43e97b, #38f9d7); transition: .4s; border-radius: 20px;"></span></label>
+        </div>
+      </div>
+
+      <div style="background: #fff3e0; border-radius: 12px; padding: 1rem;">
+        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Notification Frequency</label>
+        <select style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 8px; background: white;">
+          <option>Instantly</option>
+          <option>Hourly Digest</option>
+          <option>Daily Digest</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Privacy & Security Settings -->
+    <div class="settings-detail" id="privacy-settings" style="display: none; padding: 1.5rem;">
+      <div class="settings-header" style="background: none; padding: 0 0 1rem 0; color: #2c3e50;">
+        <button class="back-btn" onclick="showSettingsMain()" style="background: none; border: none; color: #667eea; font-size: 1.2rem; cursor: pointer;">‹ Back</button>
+        <h3 style="margin: 0.5rem 0;">🛡️ Privacy & Security</h3>
+      </div>
+      
+      <div style="background: #f8f9fa; border-radius: 12px; padding: 1rem; margin-bottom: 1rem;">
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Profile Visibility</label>
+          <select style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 8px; background: white;">
+            <option>Public</option>
+            <option>Followers Only</option>
+            <option>Private</option>
+          </select>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <div><strong>Share usage data</strong><br><small style="color: #6c757d;">Help improve platform</small></div>
+          <label style="position: relative; display: inline-block; width: 50px; height: 24px;"><input type="checkbox" style="opacity: 0; width: 0; height: 0;"><span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px;"></span></label>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div><strong>Personalized ads</strong><br><small style="color: #6c757d;">Relevant advertisements</small></div>
+          <label style="position: relative; display: inline-block; width: 50px; height: 24px;"><input type="checkbox" style="opacity: 0; width: 0; height: 0;"><span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px;"></span></label>
+        </div>
+      </div>
+
+      <div style="background: #f0f8ff; border-radius: 12px; padding: 1rem; margin-bottom: 1rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <div><strong>Two-Factor Authentication</strong><br><small style="color: #6c757d;">Extra security layer</small></div>
+          <button onclick="alert('2FA setup')" style="padding: 0.5rem 1rem; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer;">Enable</button>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <div><strong>Active Sessions</strong><br><small style="color: #6c757d;">Manage logged devices</small></div>
+          <button onclick="alert('Active sessions')" style="padding: 0.5rem 1rem; background: #17a2b8; color: white; border: none; border-radius: 6px; cursor: pointer;">View</button>
+        </div>
+        
+        <button onclick="alert('Search history deleted')" style="width: 100%; padding: 0.75rem; background: #e53e3e; color: white; border: none; border-radius: 8px; cursor: pointer;">Delete Search History</button>
+      </div>
+    </div>
+
+    <!-- Appearance Settings -->
+    <div class="settings-detail" id="appearance-settings" style="display: none; padding: 1.5rem;">
+      <div class="settings-header" style="background: none; padding: 0 0 1rem 0; color: #2c3e50;">
+        <button class="back-btn" onclick="showSettingsMain()" style="background: none; border: none; color: #667eea; font-size: 1.2rem; cursor: pointer;">‹ Back</button>
+        <h3 style="margin: 0.5rem 0;">🎨 Appearance</h3>
+      </div>
+      
+      <div style="background: #f8f9fa; border-radius: 12px; padding: 1rem; margin-bottom: 1rem;">
+        <h4 style="color: #667eea; margin-bottom: 1rem;">Theme</h4>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+          <div onclick="alert('Light theme')" style="padding: 1rem; background: white; border: 2px solid #667eea; border-radius: 12px; text-align: center; cursor: pointer;">
+            <div style="width: 40px; height: 30px; background: linear-gradient(135deg, #ffffff, #f8f9fa); border-radius: 6px; margin: 0 auto 0.5rem;"></div>
+            <span style="font-weight: 600;">Light</span>
+          </div>
+          <div onclick="alert('Dark theme')" style="padding: 1rem; background: white; border: 2px solid transparent; border-radius: 12px; text-align: center; cursor: pointer;">
+            <div style="width: 40px; height: 30px; background: linear-gradient(135deg, #2c3e50, #34495e); border-radius: 6px; margin: 0 auto 0.5rem;"></div>
+            <span style="font-weight: 600;">Dark</span>
+          </div>
+          <div onclick="alert('System theme')" style="padding: 1rem; background: white; border: 2px solid transparent; border-radius: 12px; text-align: center; cursor: pointer;">
+            <div style="width: 40px; height: 30px; background: linear-gradient(135deg, #ffffff, #2c3e50); border-radius: 6px; margin: 0 auto 0.5rem;"></div>
+            <span style="font-weight: 600;">System</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="background: #f0f8ff; border-radius: 12px; padding: 1rem; margin-bottom: 1rem;">
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Accent Color</label>
+          <div style="display: flex; gap: 0.5rem;">
+            <div onclick="alert('Blue selected')" style="width: 30px; height: 30px; background: #667eea; border-radius: 50%; cursor: pointer; border: 3px solid #667eea;"></div>
+            <div onclick="alert('Red selected')" style="width: 30px; height: 30px; background: #e74c3c; border-radius: 50%; cursor: pointer; border: 3px solid transparent;"></div>
+            <div onclick="alert('Orange selected')" style="width: 30px; height: 30px; background: #f39c12; border-radius: 50%; cursor: pointer; border: 3px solid transparent;"></div>
+            <div onclick="alert('Green selected')" style="width: 30px; height: 30px; background: #27ae60; border-radius: 50%; cursor: pointer; border: 3px solid transparent;"></div>
+          </div>
+        </div>
+        
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Font Size</label>
+          <input type="range" min="12" max="20" value="16" style="width: 100%;" oninput="alert('Font size: ' + this.value + 'px')">
+          <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #6c757d;">
+            <span>Small</span><span>Medium</span><span>Large</span>
+          </div>
+        </div>
+        
+        <div>
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Animation Density</label>
+          <select style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 8px; background: white;">
+            <option>Smooth - Full animations</option>
+            <option selected>Moderate - Balanced</option>
+            <option>Minimal - Low performance</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-detail" id="about-settings" style="display: none; padding: 1.5rem;">
+      <div class="settings-header" style="background: none; padding: 0 0 1rem 0; color: #2c3e50;">
+        <button class="back-btn" onclick="showSettingsMain()" style="background: none; border: none; color: #667eea; font-size: 1.2rem; cursor: pointer;">‹ Back</button>
+        <h3 style="margin: 0.5rem 0;">About</h3>
+      </div>
+      <div class="about-item" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #f8f9fa; border-radius: 8px; margin-bottom: 0.5rem;">
+        <span>App Version</span>
+        <span class="version" style="color: #667eea; font-weight: 600;">1.0.0</span>
+      </div>
+      <div class="about-item" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #f8f9fa; border-radius: 8px; margin-bottom: 0.5rem;">
+        <span>Developer</span>
+        <span style="color: #667eea; font-weight: 600;">Munana Merveille</span>
+      </div>
+    </div>
+
+    <div class="settings-detail" id="actions-settings" style="display: none; padding: 1.5rem;">
+      <div class="settings-header" style="background: none; padding: 0 0 1rem 0; color: #2c3e50;">
+        <button class="back-btn" onclick="showSettingsMain()" style="background: none; border: none; color: #667eea; font-size: 1.2rem; cursor: pointer;">‹ Back</button>
+        <h3 style="margin: 0.5rem 0;">Account Actions</h3>
+      </div>
+      
+      <div class="action-item" style="padding: 1rem; background: #f8f9fa; border-radius: 8px; margin-bottom: 1rem;">
+        <div class="action-info">
+          <h4 style="margin: 0 0 0.5rem 0;">Logout</h4>
+          <p style="margin: 0; color: #6c757d;">Sign out of your account on this device</p>
+        </div>
+        <button class="logout-action-btn" onclick="logout()" style="width: 100%; margin-top: 1rem; padding: 0.75rem; background: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer;">Logout</button>
+      </div>
+      
+      <div class="action-item danger" style="padding: 1rem; background: #fff5f5; border: 1px solid #fed7d7; border-radius: 8px;">
+        <div class="action-info">
+          <h4 style="margin: 0 0 0.5rem 0; color: #e53e3e;">Delete Account</h4>
+          <p style="margin: 0; color: #6c757d;">Permanently delete your account and all associated data. This action cannot be undone.</p>
+        </div>
+        <button class="delete-action-btn" onclick="showDeleteConfirmation()" style="width: 100%; margin-top: 1rem; padding: 0.75rem; background: #e53e3e; color: white; border: none; border-radius: 5px; cursor: pointer;">Delete Account</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="welcome">
+      <div class="profile-section">
+        <div class="profile-avatar" id="profileAvatar" onclick="uploadProfilePicture()">
+          <span id="avatarText">U</span>
+          <input type="file" id="profilePictureInput" accept="image/*" style="display:none" onchange="handleProfilePicture(event)">
+        </div>
+        <div class="profile-greeting">
+          <h1 id="profileGreeting">Hey User!</h1>
+          <p>Access your courses, join community discussions, and track your progress on your empowerment journey.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Student Dashboard -->
+    <div class="grid" id="student-dashboard" style="display: none;">
+      <div class="card">
+        <h3>📚 My Courses</h3>
+        <div id="enrolledCourses">
+          <p>No courses enrolled yet.</p>
+        </div>
+        <div class="course-actions" style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <button class="btn" onclick="showCourseSearch()">Browse Courses</button>
+          <button class="btn" onclick="showFavoriteCourses()" style="background: #e74c3c;">❤️ Favorites</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>📈 Course Progress</h3>
+        <div id="courseProgress">
+          <p>Your learning progress will appear here.</p>
+        </div>
+        <button class="btn" onclick="showProgressDetails()">View Details</button>
+      </div>
+
+      <div class="card">
+        <h3>🏆 Certificates</h3>
+        <div id="certificates">
+          <p>Earned certificates will appear here.</p>
+        </div>
+        <button class="btn" onclick="showCertificates()">View All</button>
+      </div>
+
+      <div class="card">
+        <h3>💬 Community Chat</h3>
+        <div id="joinedRooms">
+          <p>Join chat rooms to connect with other women.</p>
+        </div>
+        <button class="btn" onclick="window.location.href='index.html#community'">Join Community</button>
+      </div>
+    </div>
+
+    <!-- Teacher Dashboard -->
+    <div class="grid" id="teacher-dashboard" style="display: none;">
+      <div class="card">
+        <h3>📝 My Courses</h3>
+        <div id="teacherCourses">
+          <p>No courses created yet.</p>
+        </div>
+        <div class="course-actions" style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <button class="btn" onclick="createNewCourse()">+ Create Course</button>
+          <button class="btn" onclick="showDraftCourses()" style="background: #f39c12;">📄 Drafts</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>👥 Students</h3>
+        <div id="studentManagement">
+          <p>Student enrollment data will appear here.</p>
+        </div>
+        <button class="btn" onclick="showStudentManagement()">Manage Students</button>
+      </div>
+
+      <div class="card">
+        <h3>📊 Analytics</h3>
+        <div id="courseAnalytics">
+          <p>Course performance analytics will appear here.</p>
+        </div>
+        <button class="btn" onclick="showAnalytics()">View Analytics</button>
+      </div>
+
+      <div class="card">
+        <h3>💬 Community Chat</h3>
+        <div id="joinedRooms">
+          <p>Join chat rooms to connect with other women.</p>
+        </div>
+        <button class="btn" onclick="window.location.href='index.html#community'">Join Community</button>
+      </div>
+    </div>
+
+    <!-- Course Management Modals -->
+    <div id="courseModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000;">
+      <div class="modal-content" style="background: white; margin: 5% auto; padding: 2rem; width: 80%; max-width: 600px; border-radius: 10px; max-height: 80vh; overflow-y: auto;">
+        <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h3 id="modalTitle">Course Management</h3>
+          <button onclick="closeModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">×</button>
+        </div>
+        <div id="modalBody"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Check if user is logged in
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      window.location.href = 'login.html';
+    }
+
+    // Load user info
+    async function loadUserInfo() {
+      try {
+        const response = await fetch('/api/auth/me', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          document.getElementById('userName').textContent = `Welcome, ${data.user.name}!`;
+        }
+      } catch (error) {
+        console.error('Error loading user info:', error);
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('authToken');
+      window.location.href = 'login.html';
+    }
+
+    function goToSection(section) {
+      localStorage.setItem('targetSection', section);
+      window.location.href = 'index.html';
+    }
+    
+    function showProfile() {
+      window.location.href = 'profile.html';
+    }
+    
+    function showCoursesSection() {
+      alert('Courses section - Browse available courses here!');
+    }
+    
+    function showCommunitySection() {
+      alert('Community section - Join chat rooms and connect!');
+    }
+    
+    function toggleSettings() {
+      document.getElementById('settingsSidebar').classList.toggle('active');
+    }
+    
+    function showSettingsDetail(category) {
+      document.getElementById('settings-main').style.display = 'none';
+      document.getElementById(category + '-settings').style.display = 'block';
+    }
+    
+    function showSettingsMain() {
+      document.querySelectorAll('.settings-detail').forEach(detail => {
+        detail.style.display = 'none';
+      });
+      document.getElementById('settings-main').style.display = 'block';
+    }
+    
+    function saveAccountSettings() {
+      const fullName = document.getElementById('full-name').value;
+      const email = document.getElementById('email').value;
+      const phone = document.getElementById('phone').value;
+      const username = document.getElementById('username').value;
+      const bio = document.getElementById('bio').value;
+      
+      if (fullName || email || phone || username || bio) {
+        alert('Profile updated successfully!');
+      } else {
+        alert('Please fill in at least one field to update.');
+      }
+    }
+    
+    function linkGoogle() {
+      const isLinked = localStorage.getItem('google-linked') === 'true';
+      if (isLinked) {
+        if (confirm('Unlink Google account?')) {
+          localStorage.removeItem('google-linked');
+          updateAccountStatus('google', false);
+        }
+      } else {
+        window.open('https://accounts.google.com/oauth/authorize?client_id=demo&redirect_uri=' + encodeURIComponent(window.location.origin) + '&scope=email profile', 'google-auth', 'width=500,height=600');
+        setTimeout(() => {
+          localStorage.setItem('google-linked', 'true');
+          updateAccountStatus('google', true);
+        }, 2000);
+      }
+    }
+    
+    function linkFacebook() {
+      const isLinked = localStorage.getItem('facebook-linked') === 'true';
+      if (isLinked) {
+        if (confirm('Unlink Facebook account?')) {
+          localStorage.removeItem('facebook-linked');
+          updateAccountStatus('facebook', false);
+        }
+      } else {
+        window.open('https://www.facebook.com/v18.0/dialog/oauth?client_id=demo&redirect_uri=' + encodeURIComponent(window.location.origin), 'facebook-auth', 'width=500,height=600');
+        setTimeout(() => {
+          localStorage.setItem('facebook-linked', 'true');
+          updateAccountStatus('facebook', true);
+        }, 2000);
+      }
+    }
+    
+    function linkGitHub() {
+      const isLinked = localStorage.getItem('github-linked') === 'true';
+      if (isLinked) {
+        if (confirm('Unlink GitHub account?')) {
+          localStorage.removeItem('github-linked');
+          updateAccountStatus('github', false);
+        }
+      } else {
+        window.open('https://github.com/login/oauth/authorize?client_id=demo&redirect_uri=' + encodeURIComponent(window.location.origin), 'github-auth', 'width=500,height=600');
+        setTimeout(() => {
+          localStorage.setItem('github-linked', 'true');
+          updateAccountStatus('github', true);
+        }, 2000);
+      }
+    }
+    
+    function updateAccountStatus(provider, isLinked) {
+      const statusEl = document.getElementById(provider + '-status');
+      const btnEl = document.getElementById(provider + '-btn');
+      
+      if (isLinked) {
+        statusEl.innerHTML = statusEl.innerHTML.replace(provider.charAt(0).toUpperCase() + provider.slice(1), provider.charAt(0).toUpperCase() + provider.slice(1) + ' ✅');
+        btnEl.textContent = 'Unlink';
+        btnEl.style.background = '#dc3545';
+      } else {
+        statusEl.innerHTML = statusEl.innerHTML.replace(' ✅', '');
+        btnEl.textContent = 'Link Account';
+        btnEl.style.background = provider === 'google' ? '#4285f4' : provider === 'facebook' ? '#1877f2' : '#333';
+      }
+    }
+    
+    function loadConnectedAccounts() {
+      if (localStorage.getItem('google-linked') === 'true') updateAccountStatus('google', true);
+      if (localStorage.getItem('facebook-linked') === 'true') updateAccountStatus('facebook', true);
+      if (localStorage.getItem('github-linked') === 'true') updateAccountStatus('github', true);
+    }
+    
+    function showDeleteConfirmation() {
+      if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+        if (confirm('This will permanently delete all your data. Type DELETE to confirm.')) {
+          alert('Account deletion initiated. You will receive a confirmation email.');
+        }
+      }
+    }
+    
+    function manageCourses() {
+      const enrollments = JSON.parse(localStorage.getItem('enrollments') || '[]');
+      if (enrollments.length === 0) {
+        alert('No courses to manage.');
+        return;
+      }
+      
+      if (confirm('Do you want to quit your current courses?')) {
+        localStorage.removeItem('enrollments');
+        loadEnrolledCourses();
+        alert('All courses removed.');
+      }
+    }
+    
+    function showNotifications() {
+      alert('Notifications feature coming soon!');
+    }
+    
+    function changePassword() {
+      alert('Change password feature coming soon!');
+    }
+    
+    function manageNotifications() {
+      alert('Notification settings coming soon!');
+    }
+    
+    function privacySettings() {
+      alert('Privacy settings coming soon!');
+    }
+    
+    function toggleTheme() {
+      alert('Theme toggle coming soon!');
+    }
+    
+    function changeLanguage() {
+      alert('Language settings coming soon!');
+    }
+    
+    function helpSupport() {
+      alert('Help & Support coming soon!');
+    }
+    
+    function deleteAccount() {
+      if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+        alert('Account deletion feature coming soon!');
+      }
+    }
+    
+    function connectedAccounts() {
+      alert('Connected Accounts: Link/Unlink Google, Facebook, GitHub');
+    }
+    
+    function coursePreferences() {
+      alert('Course Preferences: Autoplay, Subtitles, Playback Speed');
+    }
+    
+    function communityPreferences() {
+      alert('Community Preferences: Message settings, Mute options');
+    }
+    
+    function notificationSettings() {
+      alert('Notifications: Push, Email, Course alerts, Community alerts');
+    }
+    
+    function securitySettings() {
+      alert('Security: Two-factor auth, Login history, Logout devices');
+    }
+    
+    function themeSettings() {
+      alert('Theme: Light mode, Dark mode, System mode');
+    }
+    
+    function manageChatRooms() {
+      const joinedRooms = JSON.parse(localStorage.getItem('joinedRooms') || '[]');
+      if (joinedRooms.length === 0) {
+        alert('No chat rooms to leave.');
+        return;
+      }
+      
+      if (confirm('Do you want to leave all chat rooms?')) {
+        localStorage.removeItem('joinedRooms');
+        loadJoinedRooms();
+        alert('Left all chat rooms.');
+      }
+    }
+    
+    function aboutApp() {
+      alert('Breaking Cycles v1.0\nEmpowering Women Through Education\nTerms & Conditions | Privacy Policy\nDeveloped by Munana Merveille');
+    }
+    
+    function showResources() {
+      const resourcesHtml = `
+        <div style="padding: 1rem;">
+          <h4>📚 Educational Resources</h4>
+          <ul style="list-style: none; padding: 0;">
+            <li style="margin: 0.5rem 0;"><a href="https://www.khanacademy.org" target="_blank">🎓 Khan Academy - Free Courses</a></li>
+            <li style="margin: 0.5rem 0;"><a href="https://www.coursera.org/browse/personal-development" target="_blank">💼 Coursera - Personal Development</a></li>
+            <li style="margin: 0.5rem 0;"><a href="https://www.freecodecamp.org" target="_blank">💻 FreeCodeCamp - Coding Skills</a></li>
+          </ul>
+          <h4>💰 Scholarships & Support</h4>
+          <ul style="list-style: none; padding: 0;">
+            <li style="margin: 0.5rem 0;"><a href="#" target="_blank">🎯 Women in Tech Scholarships</a></li>
+            <li style="margin: 0.5rem 0;"><a href="#" target="_blank">👩‍💼 Entrepreneurship Grants</a></li>
+          </ul>
+        </div>
+      `;
+      document.getElementById('personalizedResources').innerHTML = resourcesHtml;
+    }
+    
+    function loadUserDashboard() {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      const userRole = user.role || 'student';
+      
+      if (userRole === 'teacher') {
+        document.getElementById('teacher-dashboard').style.display = 'grid';
+        document.getElementById('student-dashboard').style.display = 'none';
+        loadTeacherCourses();
+        loadStudentManagement();
+        loadCourseAnalytics();
+      } else {
+        document.getElementById('student-dashboard').style.display = 'grid';
+        document.getElementById('teacher-dashboard').style.display = 'none';
+        loadEnrolledCourses();
+        loadCourseProgress();
+        loadCertificates();
+      }
+    }
+    
+    function loadEnrolledCourses() {
+      const enrollments = JSON.parse(localStorage.getItem('enrollments') || '[]');
+      const coursesDiv = document.getElementById('enrolledCourses');
+      
+      if (enrollments.length === 0) {
+        coursesDiv.innerHTML = '<p>No courses enrolled yet. Start your learning journey!</p>';
+      } else {
+        let coursesHtml = '';
+        enrollments.forEach((enrollment, index) => {
+          const progress = Math.floor(Math.random() * 100);
+          coursesHtml += `
+            <div style="padding: 1rem; background: #f0f4ff; border-radius: 10px; border-left: 4px solid #667eea; margin-bottom: 1rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <strong>📚 ${enrollment.courses[0]}</strong>
+                <span style="background: #667eea; color: white; padding: 0.2rem 0.5rem; border-radius: 15px; font-size: 0.8rem;">${progress}%</span>
+              </div>
+              <div style="margin-bottom: 0.5rem;"><strong>🎯 Timeline:</strong> ${enrollment.timeline}</div>
+              <div style="margin-bottom: 1rem;"><strong>🎯 Goals:</strong> ${enrollment.goals || 'Not specified'}</div>
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <button onclick="continueCourse(${index})" style="padding: 0.3rem 0.8rem; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 0.8rem;">Continue</button>
+                <button onclick="viewCourseDetails(${index})" style="padding: 0.3rem 0.8rem; background: #17a2b8; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 0.8rem;">Details</button>
+                <button onclick="unenrollCourse(${index})" style="padding: 0.3rem 0.8rem; background: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 0.8rem;">Unenroll</button>
+              </div>
+            </div>
+          `;
+        });
+        coursesDiv.innerHTML = coursesHtml;
+      }
+    }
+    
+    function loadCourseProgress() {
+      const enrollments = JSON.parse(localStorage.getItem('enrollments') || '[]');
+      const progressDiv = document.getElementById('courseProgress');
+      
+      if (enrollments.length === 0) {
+        progressDiv.innerHTML = '<p>No course progress to display.</p>';
+      } else {
+        let progressHtml = '';
+        enrollments.forEach(enrollment => {
+          const progress = Math.floor(Math.random() * 100);
+          const lessonsCompleted = Math.floor(Math.random() * 20);
+          const totalLessons = lessonsCompleted + Math.floor(Math.random() * 10) + 1;
+          
+          progressHtml += `
+            <div style="padding: 0.8rem; background: #f8f9fa; border-radius: 8px; margin-bottom: 0.8rem;">
+              <div style="font-weight: 600; margin-bottom: 0.5rem;">${enrollment.courses[0]}</div>
+              <div style="background: #e9ecef; border-radius: 10px; height: 8px; margin-bottom: 0.5rem;">
+                <div style="background: linear-gradient(135deg, #667eea, #764ba2); height: 100%; width: ${progress}%; border-radius: 10px;"></div>
+              </div>
+              <div style="font-size: 0.8rem; color: #6c757d;">${lessonsCompleted}/${totalLessons} lessons • ${progress}% complete</div>
+            </div>
+          `;
+        });
+        progressDiv.innerHTML = progressHtml;
+      }
+    }
+    
+    function loadCertificates() {
+      const certificates = JSON.parse(localStorage.getItem('certificates') || '[]');
+      const certDiv = document.getElementById('certificates');
+      
+      if (certificates.length === 0) {
+        certDiv.innerHTML = '<p>Complete courses to earn certificates!</p>';
+      } else {
+        let certHtml = '';
+        certificates.forEach(cert => {
+          certHtml += `
+            <div style="padding: 0.8rem; background: #fff3cd; border-radius: 8px; margin-bottom: 0.8rem; border-left: 4px solid #ffc107;">
+              <div style="font-weight: 600; margin-bottom: 0.3rem;">🏆 ${cert.course}</div>
+              <div style="font-size: 0.8rem; color: #856404; margin-bottom: 0.5rem;">Earned: ${cert.date}</div>
+              <button onclick="downloadCertificate('${cert.id}')" style="padding: 0.3rem 0.8rem; background: #ffc107; color: #212529; border: none; border-radius: 5px; cursor: pointer; font-size: 0.8rem;">Download</button>
+            </div>
+          `;
+        });
+        certDiv.innerHTML = certHtml;
+      }
+    }
+    
+    function loadTeacherCourses() {
+      const teacherCourses = JSON.parse(localStorage.getItem('teacherCourses') || '[]');
+      const coursesDiv = document.getElementById('teacherCourses');
+      
+      if (teacherCourses.length === 0) {
+        coursesDiv.innerHTML = '<p>No courses created yet. Create your first course!</p>';
+      } else {
+        let coursesHtml = '';
+        teacherCourses.forEach((course, index) => {
+          const students = Math.floor(Math.random() * 100);
+          const rating = (Math.random() * 2 + 3).toFixed(1);
+          
+          coursesHtml += `
+            <div style="padding: 1rem; background: #f0f8ff; border-radius: 10px; border-left: 4px solid #667eea; margin-bottom: 1rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <strong>📚 ${course.title}</strong>
+                <span style="background: ${course.status === 'published' ? '#28a745' : '#ffc107'}; color: white; padding: 0.2rem 0.5rem; border-radius: 15px; font-size: 0.8rem;">${course.status}</span>
+              </div>
+              <div style="margin-bottom: 0.5rem; font-size: 0.9rem; color: #6c757d;">${course.description}</div>
+              <div style="margin-bottom: 1rem; font-size: 0.8rem;">👥 ${students} students • ⭐ ${rating}/5.0</div>
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <button onclick="editCourse(${index})" style="padding: 0.3rem 0.8rem; background: #17a2b8; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 0.8rem;">Edit</button>
+                <button onclick="manageLessons(${index})" style="padding: 0.3rem 0.8rem; background: #6f42c1; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 0.8rem;">Lessons</button>
+                <button onclick="viewStudents(${index})" style="padding: 0.3rem 0.8rem; background: #fd7e14; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 0.8rem;">Students</button>
+                <button onclick="${course.status === 'published' ? 'unpublishCourse' : 'publishCourse'}(${index})" style="padding: 0.3rem 0.8rem; background: ${course.status === 'published' ? '#dc3545' : '#28a745'}; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 0.8rem;">${course.status === 'published' ? 'Unpublish' : 'Publish'}</button>
+              </div>
+            </div>
+          `;
+        });
+        coursesDiv.innerHTML = coursesHtml;
+      }
+    }
+    
+    function loadStudentManagement() {
+      const studentData = {
+        totalStudents: Math.floor(Math.random() * 500) + 50,
+        activeStudents: Math.floor(Math.random() * 300) + 30,
+        avgProgress: Math.floor(Math.random() * 40) + 60
+      };
+      
+      document.getElementById('studentManagement').innerHTML = `
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem; text-align: center;">
+          <div style="padding: 1rem; background: #e3f2fd; border-radius: 8px;">
+            <div style="font-size: 1.5rem; font-weight: bold; color: #1976d2;">${studentData.totalStudents}</div>
+            <div style="font-size: 0.8rem; color: #424242;">Total Students</div>
+          </div>
+          <div style="padding: 1rem; background: #e8f5e8; border-radius: 8px;">
+            <div style="font-size: 1.5rem; font-weight: bold; color: #388e3c;">${studentData.activeStudents}</div>
+            <div style="font-size: 0.8rem; color: #424242;">Active This Week</div>
+          </div>
+          <div style="padding: 1rem; background: #fff3e0; border-radius: 8px;">
+            <div style="font-size: 1.5rem; font-weight: bold; color: #f57c00;">${studentData.avgProgress}%</div>
+            <div style="font-size: 0.8rem; color: #424242;">Avg Progress</div>
+          </div>
+        </div>
+      `;
+    }
+    
+    function loadCourseAnalytics() {
+      const analyticsData = {
+        totalViews: Math.floor(Math.random() * 5000) + 1000,
+        completionRate: Math.floor(Math.random() * 30) + 70,
+        avgRating: (Math.random() * 1.5 + 3.5).toFixed(1)
+      };
+      
+      document.getElementById('courseAnalytics').innerHTML = `
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem; text-align: center;">
+          <div style="padding: 1rem; background: #f3e5f5; border-radius: 8px;">
+            <div style="font-size: 1.5rem; font-weight: bold; color: #7b1fa2;">${analyticsData.totalViews}</div>
+            <div style="font-size: 0.8rem; color: #424242;">Total Views</div>
+          </div>
+          <div style="padding: 1rem; background: #e0f2f1; border-radius: 8px;">
+            <div style="font-size: 1.5rem; font-weight: bold; color: #00695c;">${analyticsData.completionRate}%</div>
+            <div style="font-size: 0.8rem; color: #424242;">Completion Rate</div>
+          </div>
+          <div style="padding: 1rem; background: #fce4ec; border-radius: 8px;">
+            <div style="font-size: 1.5rem; font-weight: bold; color: #c2185b;">${analyticsData.avgRating}/5</div>
+            <div style="font-size: 0.8rem; color: #424242;">Avg Rating</div>
+          </div>
+        </div>
+      `;
+    }
+    
+    function loadJoinedRooms() {
+      const joinedRooms = JSON.parse(localStorage.getItem('joinedRooms') || '[]');
+      const roomsDiv = document.getElementById('joinedRooms');
+      
+      if (joinedRooms.length === 0) {
+        roomsDiv.innerHTML = '<p>No chat rooms joined yet. Connect with your community!</p>';
+      } else {
+        let roomsHtml = '';
+        joinedRooms.forEach(room => {
+          roomsHtml += `<div style="margin-bottom: 0.5rem; padding: 0.5rem; background: #f0f8ff; border-radius: 8px; display: flex; align-items: center; gap: 0.5rem;">`;
+          roomsHtml += `<span>💬</span> ${room}`;
+          roomsHtml += `</div>`;
+        });
+        roomsDiv.innerHTML = roomsHtml;
+      }
+    }
+
+    function uploadProfilePicture() {
+      document.getElementById('profilePictureInput').click();
+    }
+    
+    function handleProfilePicture(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const avatar = document.getElementById('profileAvatar');
+          avatar.innerHTML = `<img src="${e.target.result}" alt="Profile Picture">`;
+          localStorage.setItem('profilePicture', e.target.result);
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+    
+    function loadProfileAvatar() {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      const savedPicture = localStorage.getItem('profilePicture');
+      const firstName = user.name ? user.name.split(' ')[0] : 'User';
+      
+      document.getElementById('profileGreeting').textContent = `Hey ${firstName}!`;
+      
+      if (savedPicture) {
+        document.getElementById('profileAvatar').innerHTML = `<img src="${savedPicture}" alt="Profile Picture">`;
+      } else {
+        document.getElementById('avatarText').textContent = firstName.charAt(0).toUpperCase();
+      }
+    }
+
+    // Student Functions
+    function continueCourse(index) {
+      alert('Continuing course... Opening lesson player!');
+    }
+    
+    function viewCourseDetails(index) {
+      const enrollments = JSON.parse(localStorage.getItem('enrollments') || '[]');
+      const course = enrollments[index];
+      showModal('Course Details', `
+        <h4>${course.courses[0]}</h4>
+        <p><strong>Timeline:</strong> ${course.timeline}</p>
+        <p><strong>Goals:</strong> ${course.goals}</p>
+        <div style="margin: 1rem 0;">
+          <button onclick="watchLesson()" style="margin: 0.5rem; padding: 0.5rem 1rem; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">📹 Watch Lessons</button>
+          <button onclick="downloadMaterials()" style="margin: 0.5rem; padding: 0.5rem 1rem; background: #17a2b8; color: white; border: none; border-radius: 5px; cursor: pointer;">📄 Download Materials</button>
+          <button onclick="takeQuiz()" style="margin: 0.5rem; padding: 0.5rem 1rem; background: #ffc107; color: #212529; border: none; border-radius: 5px; cursor: pointer;">📝 Take Quiz</button>
+        </div>
+      `);
+    }
+    
+    function unenrollCourse(index) {
+      if (confirm('Are you sure you want to unenroll from this course?')) {
+        const enrollments = JSON.parse(localStorage.getItem('enrollments') || '[]');
+        enrollments.splice(index, 1);
+        localStorage.setItem('enrollments', JSON.stringify(enrollments));
+        loadEnrolledCourses();
+        alert('Successfully unenrolled from course.');
+      }
+    }
+    
+    function showCourseSearch() {
+      showModal('Browse Courses', `
+        <div style="margin-bottom: 1rem;">
+          <input type="text" placeholder="Search courses..." style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 1rem;">
+          <select style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;">
+            <option>All Categories</option>
+            <option>Financial Literacy</option>
+            <option>Coding & Tech</option>
+            <option>Entrepreneurship</option>
+            <option>Beauty & Wellness</option>
+          </select>
+        </div>
+        <div style="max-height: 300px; overflow-y: auto;">
+          <div style="padding: 1rem; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 1rem;">
+            <h5>Advanced Financial Planning</h5>
+            <p>Learn investment strategies and retirement planning</p>
+            <button onclick="enrollInCourse('Advanced Financial Planning')" style="padding: 0.5rem 1rem; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">Enroll</button>
+          </div>
+          <div style="padding: 1rem; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 1rem;">
+            <h5>Web Development Bootcamp</h5>
+            <p>Complete guide to modern web development</p>
+            <button onclick="enrollInCourse('Web Development Bootcamp')" style="padding: 0.5rem 1rem; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">Enroll</button>
+          </div>
+        </div>
+      `);
+    }
+    
+    function enrollInCourse(courseName) {
+      const enrollments = JSON.parse(localStorage.getItem('enrollments') || '[]');
+      enrollments.push({
+        courses: [courseName],
+        timeline: '3 months',
+        goals: 'Complete course and earn certificate'
+      });
+      localStorage.setItem('enrollments', JSON.stringify(enrollments));
+      loadEnrolledCourses();
+      closeModal();
+      alert(`Successfully enrolled in ${courseName}!`);
+    }
+    
+    // Teacher Functions
+    function createNewCourse() {
+      showModal('Create New Course', `
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Course Title</label>
+          <input type="text" id="courseTitle" placeholder="Enter course title" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;">
+        </div>
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Description</label>
+          <textarea id="courseDescription" placeholder="Course description" rows="3" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px; resize: vertical;"></textarea>
+        </div>
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Category</label>
+          <select id="courseCategory" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;">
+            <option>Financial Literacy</option>
+            <option>Coding & Tech</option>
+            <option>Entrepreneurship</option>
+            <option>Beauty & Wellness</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Difficulty Level</label>
+          <select id="courseDifficulty" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;">
+            <option>Beginner</option>
+            <option>Intermediate</option>
+            <option>Advanced</option>
+          </select>
+        </div>
+        <button onclick="saveCourse()" style="width: 100%; padding: 1rem; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">Create Course</button>
+      `);
+    }
+    
+    function saveCourse() {
+      const title = document.getElementById('courseTitle').value;
+      const description = document.getElementById('courseDescription').value;
+      const category = document.getElementById('courseCategory').value;
+      const difficulty = document.getElementById('courseDifficulty').value;
+      
+      if (!title || !description) {
+        alert('Please fill in all required fields.');
+        return;
+      }
+      
+      const teacherCourses = JSON.parse(localStorage.getItem('teacherCourses') || '[]');
+      teacherCourses.push({
+        title,
+        description,
+        category,
+        difficulty,
+        status: 'draft',
+        createdDate: new Date().toLocaleDateString()
+      });
+      localStorage.setItem('teacherCourses', JSON.stringify(teacherCourses));
+      loadTeacherCourses();
+      closeModal();
+      alert('Course created successfully!');
+    }
+    
+    function editCourse(index) {
+      const teacherCourses = JSON.parse(localStorage.getItem('teacherCourses') || '[]');
+      const course = teacherCourses[index];
+      showModal('Edit Course', `
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Course Title</label>
+          <input type="text" id="editCourseTitle" value="${course.title}" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;">
+        </div>
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Description</label>
+          <textarea id="editCourseDescription" rows="3" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px; resize: vertical;">${course.description}</textarea>
+        </div>
+        <button onclick="updateCourse(${index})" style="width: 100%; padding: 1rem; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">Update Course</button>
+      `);
+    }
+    
+    function updateCourse(index) {
+      const teacherCourses = JSON.parse(localStorage.getItem('teacherCourses') || '[]');
+      teacherCourses[index].title = document.getElementById('editCourseTitle').value;
+      teacherCourses[index].description = document.getElementById('editCourseDescription').value;
+      localStorage.setItem('teacherCourses', JSON.stringify(teacherCourses));
+      loadTeacherCourses();
+      closeModal();
+      alert('Course updated successfully!');
+    }
+    
+    function publishCourse(index) {
+      const teacherCourses = JSON.parse(localStorage.getItem('teacherCourses') || '[]');
+      teacherCourses[index].status = 'published';
+      localStorage.setItem('teacherCourses', JSON.stringify(teacherCourses));
+      loadTeacherCourses();
+      alert('Course published successfully!');
+    }
+    
+    function unpublishCourse(index) {
+      const teacherCourses = JSON.parse(localStorage.getItem('teacherCourses') || '[]');
+      teacherCourses[index].status = 'draft';
+      localStorage.setItem('teacherCourses', JSON.stringify(teacherCourses));
+      loadTeacherCourses();
+      alert('Course unpublished.');
+    }
+    
+    // Shared Functions
+    function showModal(title, content) {
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalBody').innerHTML = content;
+      document.getElementById('courseModal').style.display = 'block';
+    }
+    
+    function closeModal() {
+      document.getElementById('courseModal').style.display = 'none';
+    }
+    
+    function watchLesson() { alert('Opening video player...'); }
+    function downloadMaterials() { alert('Downloading course materials...'); }
+    function takeQuiz() { alert('Opening quiz interface...'); }
+    function showFavoriteCourses() { alert('Showing favorite courses...'); }
+    function showProgressDetails() {
+      const enrollments = JSON.parse(localStorage.getItem('enrollments') || '[]');
+      if (enrollments.length === 0) {
+        showModal('Progress Summary', `
+          <div style="text-align: center; padding: 2rem;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">📚</div>
+            <h4 style="margin-bottom: 1rem;">No Courses Enrolled</h4>
+            <p style="color: #6c757d; margin-bottom: 2rem;">Start your learning journey by enrolling in a course!</p>
+            <button onclick="closeModal(); showSection('learn')" style="padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 8px; cursor: pointer;">Browse Courses</button>
+          </div>
+        `);
+        return;
+      }
+      
+      const course = enrollments[0];
+      const progress = Math.floor(Math.random() * 100);
+      const isStarted = progress > 0;
+      
+      showModal('Progress Summary', `
+        <div style="padding: 1rem;">
+          <h4 style="color: #667eea; margin-bottom: 1.5rem;">${course.courses[0]}</h4>
+          
+          <div style="margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+              <span style="font-weight: 600;">Progress</span>
+              <span style="color: #667eea; font-weight: 600;">${progress}%</span>
+            </div>
+            <div style="background: #e9ecef; border-radius: 10px; height: 12px; margin-bottom: 0.5rem;">
+              <div style="background: linear-gradient(135deg, #667eea, #764ba2); height: 100%; width: ${progress}%; border-radius: 10px; transition: width 0.3s ease;"></div>
+            </div>
+            <p style="color: #6c757d; font-size: 0.9rem; margin-bottom: 1rem;">${isStarted ? `You are ${progress}% through this course. Keep going!` : 'You have not started this course yet.'}</p>
+            <button onclick="${isStarted ? 'alert("Continuing course...")' : 'alert("Starting course...")'}" style="width: 100%; padding: 0.75rem; background: ${isStarted ? '#28a745' : '#667eea'}; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">${isStarted ? 'Continue Course' : 'Start Course'}</button>
+          </div>
+          
+          <div>
+            <h5 style="color: #667eea; margin-bottom: 1rem;">Course Structure</h5>
+            <div style="background: #f8f9fa; border-radius: 8px; padding: 1rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid #e9ecef;">
+                <span>• Introduction</span>
+                <span style="color: ${progress > 10 ? '#28a745' : '#6c757d'}; font-size: 0.8rem;">${progress > 10 ? '1/1' : '0/1'} completed</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid #e9ecef;">
+                <span>• Lesson 1</span>
+                <span style="color: ${progress > 30 ? '#28a745' : '#6c757d'}; font-size: 0.8rem;">${progress > 30 ? '3/3' : progress > 10 ? '1/3' : '0/3'} completed</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid #e9ecef;">
+                <span>• Lesson 2</span>
+                <span style="color: ${progress > 60 ? '#28a745' : '#6c757d'}; font-size: 0.8rem;">${progress > 60 ? '4/4' : progress > 30 ? '2/4' : '0/4'} completed</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0;">
+                <span style="color: ${progress < 80 ? '#6c757d' : '#2c3e50'};• Final Quiz</span>
+                <span style="color: ${progress >= 80 ? '#28a745' : '#dc3545'}; font-size: 0.8rem;">${progress >= 80 ? 'completed' : 'locked'}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `);
+    }
+    function showCertificates() { alert('Showing all certificates...'); }
+    function downloadCertificate(id) { alert('Downloading certificate...'); }
+    function manageLessons(index) { alert('Opening lesson builder...'); }
+    function viewStudents(index) { alert('Showing student list...'); }
+    function showStudentManagement() { alert('Opening student management...'); }
+    function showAnalytics() { alert('Opening detailed analytics...'); }
+    function showDraftCourses() { alert('Showing draft courses...'); }
+    
+    // Load user info on page load
+    loadUserInfo();
+    loadUserDashboard();
+    loadJoinedRooms();
+    loadProfileAvatar();
+    loadConnectedAccounts();
+  </script>
+</body>
+</html>

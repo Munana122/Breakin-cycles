@@ -51,7 +51,23 @@
       border:2px solid #ecf0f1;
       font-size:1rem;
     }
-    .form-group input:focus { outline:none; border-color:#667eea; }
+    .form-group input:focus,
+    .form-group select:focus { outline:none; border-color:#667eea; }
+    
+    .form-group select {
+      width: 100%;
+      padding: 0.9rem 1rem;
+      border-radius: 10px;
+      border: 2px solid #ecf0f1;
+      font-size: 1rem;
+      background: white;
+      cursor: pointer;
+      appearance: none;
+      background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"><path fill="%23667eea" d="M2 0L0 2h4zm0 5L0 3h4z"/></svg>');
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      background-size: 12px;
+    }
 
     .btn-submit {
       background: linear-gradient(135deg,#667eea,#764ba2);
@@ -121,6 +137,24 @@
           <input type="password" id="signupPassword" name="password" required placeholder="Create a password" autocomplete="new-password">
         </div>
 
+        <div class="form-group">
+          <label for="signupPhone">Phone Number</label>
+          <input type="tel" id="signupPhone" name="phone" placeholder="Your phone number" autocomplete="tel">
+        </div>
+
+        <div class="form-group">
+          <label for="signupLocation">Location</label>
+          <input type="text" id="signupLocation" name="location" placeholder="Your city/location" autocomplete="address-level2">
+        </div>
+        
+        <div class="form-group">
+          <label for="userRole">Join as:</label>
+          <select id="userRole" name="role" required>
+            <option value="student">Student</option>
+            <option value="teacher">Teacher</option>
+          </select>
+        </div>
+
         <button type="submit" class="btn-submit">🎉 Sign Up</button>
 
         <p class="helper">By signing up you agree to our <a href="#" class="link">Terms</a> and <a href="#" class="link">Privacy Policy</a>.</p>
@@ -133,25 +167,49 @@
   </main>
 
   <script>
-    // Basic demo handling for signup — replace with your registration logic
-    document.getElementById('signupForm').addEventListener('submit', function(e){
+    document.getElementById('signupForm').addEventListener('submit', async function(e){
       e.preventDefault();
       const name = document.getElementById('signupName').value.trim();
       const email = document.getElementById('signupEmail').value.trim();
       const password = document.getElementById('signupPassword').value;
+      const phone = document.getElementById('signupPhone').value.trim();
+      const location = document.getElementById('signupLocation').value.trim();
+      const role = document.getElementById('userRole').value;
 
       if (!name || !email || !password) {
-        alert('Please complete all fields.');
+        alert('Please complete all required fields.');
         return;
       }
 
-      console.log('Signup submitted:', { name, email, password });
-      document.getElementById('signupSuccess').style.display = 'block';
+      try {
+        const response = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ name, email, password, phone, location, role })
+        });
 
-      // In a real app, send to server, create account, then redirect to dashboard or login
-      setTimeout(() => {
-        window.location.href = 'login.html';
-      }, 1400);
+        const data = await response.json();
+
+        if (response.ok) {
+          document.getElementById('signupSuccess').style.display = 'block';
+          document.getElementById('signupSuccess').innerHTML = '✅ Account created successfully!';
+          
+          setTimeout(() => {
+            if (role === 'teacher') {
+              window.location.href = 'teacher-dashboard.html';
+            } else {
+              window.location.href = 'dashboard.html';
+            }
+          }, 1500);
+        } else {
+          alert(data.error || 'Registration failed');
+        }
+      } catch (error) {
+        console.error('Registration error:', error);
+        alert('Registration failed. Please try again.');
+      }
     });
   </script>
 </body>

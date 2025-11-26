@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Profile — Breaking Cycles</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.6;
+      color: #2c3e50;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+    }
+    
+    .header {
+      background: white;
+      padding: 1rem 2rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .brand {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #667eea;
+      text-decoration: none;
+    }
+    
+    .nav-btn {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-left: 0.5rem;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+    }
+    
+    .profile-card {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+      margin-bottom: 2rem;
+    }
+    
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+    
+    .avatar {
+      width: 100px;
+      height: 100px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 2rem;
+      font-weight: bold;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: #2c3e50;
+    }
+    
+    .form-group input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 2px solid #ecf0f1;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+    
+    .btn {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-right: 1rem;
+    }
+    
+    .btn-secondary {
+      background: #95a5a6;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <a href="dashboard.html" class="brand">🌟 Breaking Cycles</a>
+    <div>
+      <button class="nav-btn" onclick="window.location.href='dashboard.html'">Dashboard</button>
+      <button class="nav-btn" onclick="logout()">Logout</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="profile-card">
+      <h1>My Profile</h1>
+      <div class="profile-header">
+        <div class="avatar" id="userAvatar">MU</div>
+        <div>
+          <h2 id="displayName">Mock User</h2>
+          <p id="displayEmail">user@example.com</p>
+        </div>
+      </div>
+      
+      <form id="profileForm">
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <input type="text" id="name" name="name" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="phone">Phone Number</label>
+          <input type="tel" id="phone" name="phone">
+        </div>
+        
+        <div class="form-group">
+          <label for="location">Location</label>
+          <input type="text" id="location" name="location">
+        </div>
+        
+        <button type="submit" class="btn">Update Profile</button>
+        <button type="button" class="btn btn-secondary" onclick="window.location.href='dashboard.html'">Cancel</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      window.location.href = 'login.html';
+    }
+
+    async function loadProfile() {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      
+      document.getElementById('displayName').textContent = user.name || 'Mock User';
+      document.getElementById('displayEmail').textContent = user.email || 'user@example.com';
+      document.getElementById('userAvatar').textContent = user.avatar || 'MU';
+      
+      document.getElementById('name').value = user.name || '';
+      document.getElementById('email').value = user.email || '';
+      document.getElementById('phone').value = user.phone || '';
+      document.getElementById('location').value = user.location || '';
+    }
+
+    document.getElementById('profileForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(e.target);
+      const updatedUser = {
+        name: formData.get('name'),
+        email: formData.get('email'),
+        phone: formData.get('phone'),
+        location: formData.get('location'),
+        avatar: formData.get('name').substring(0, 2).toUpperCase()
+      };
+      
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      alert('Profile updated successfully!');
+      loadProfile();
+    });
+
+    function logout() {
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('user');
+      window.location.href = 'login.html';
+    }
+
+    loadProfile();
+  </script>
+</body>
+</html>
