@@ -1036,7 +1036,7 @@
                     <button class="signup-btn" onclick="showSection('signup')" style="background: #8B7CF6; border: 2px solid #8B7CF6; color: white; padding: 0.5rem 1.5rem; border-radius: 25px; cursor: pointer; font-weight: 500;">Sign Up</button>
                 </div>
                 <div class="user-info" id="userInfo" style="display: none; align-items: center; gap: 1rem;">
-                    <div style="background: #8B7CF6; color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem; font-weight: 500;">
+                    <div onclick="showSection('dashboard')" style="background: #8B7CF6; color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.background='#7C3AED'" onmouseout="this.style.background='#8B7CF6'">
                         👋 <span id="userName">User</span>
                     </div>
                     <button onclick="logout()" style="background: #f8f9fa; border: 1px solid #ddd; color: #666; padding: 0.4rem 0.8rem; border-radius: 15px; cursor: pointer; font-size: 0.8rem;">Logout</button>
@@ -3260,6 +3260,24 @@
         
         function createCourse(event) {
             event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const courseData = {
+                id: Date.now(),
+                title: formData.get('title') || event.target.querySelector('input[type="text"]').value,
+                category: formData.get('category') || event.target.querySelector('select').value,
+                description: formData.get('description') || event.target.querySelector('textarea').value,
+                duration: formData.get('duration') || event.target.querySelector('input[type="number"]').value || '4',
+                students: Math.floor(Math.random() * 20) + 5,
+                completion: Math.floor(Math.random() * 40) + 30,
+                status: 'Draft',
+                createdAt: new Date().toISOString()
+            };
+            
+            let courses = JSON.parse(localStorage.getItem('teacherCourses') || '[]');
+            courses.push(courseData);
+            localStorage.setItem('teacherCourses', JSON.stringify(courses));
+            
             alert('Course created successfully! It will be reviewed and published soon.');
             event.target.closest('div').parentElement.remove();
         }
@@ -3316,6 +3334,60 @@
             const overlay = document.createElement('div');
             overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; display: flex; align-items: center; justify-content: center;';
             
+            const courses = JSON.parse(localStorage.getItem('teacherCourses') || '[]');
+            
+            let courseListHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 1rem; background: #f8f9fa;">
+                    <div style="flex: 1;">
+                        <h4 style="margin: 0 0 0.5rem 0; color: #2c3e50;">📊 Financial Literacy Fundamentals</h4>
+                        <p style="margin: 0 0 0.5rem 0; color: #6c757d;">24 students enrolled • 89% completion rate</p>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <span style="background: #28a745; color: white; padding: 0.2rem 0.5rem; border-radius: 12px; font-size: 0.8rem;">Published</span>
+                            <span style="background: #17a2b8; color: white; padding: 0.2rem 0.5rem; border-radius: 12px; font-size: 0.8rem;">8 hours</span>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button onclick="showCourseAnalytics('Financial Literacy Fundamentals')" style="padding: 0.5rem 1rem; background: #17a2b8; color: white; border: none; border-radius: 8px; cursor: pointer;">Analytics</button>
+                        <button onclick="editCourse('Financial Literacy Fundamentals')" style="padding: 0.5rem 1rem; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer;">Edit</button>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 1rem; background: #f8f9fa;">
+                    <div style="flex: 1;">
+                        <h4 style="margin: 0 0 0.5rem 0; color: #2c3e50;">💻 Web Development Basics</h4>
+                        <p style="margin: 0 0 0.5rem 0; color: #6c757d;">18 students enrolled • 67% completion rate</p>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <span style="background: #ffc107; color: #212529; padding: 0.2rem 0.5rem; border-radius: 12px; font-size: 0.8rem;">Draft</span>
+                            <span style="background: #17a2b8; color: white; padding: 0.2rem 0.5rem; border-radius: 12px; font-size: 0.8rem;">12 hours</span>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button onclick="showCourseAnalytics('Web Development Basics')" style="padding: 0.5rem 1rem; background: #17a2b8; color: white; border: none; border-radius: 8px; cursor: pointer;">Analytics</button>
+                        <button onclick="editCourse('Web Development Basics')" style="padding: 0.5rem 1rem; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer;">Edit</button>
+                    </div>
+                </div>
+            `;
+            
+            courses.forEach(course => {
+                const statusColor = course.status === 'Published' ? '#28a745' : '#ffc107';
+                const statusTextColor = course.status === 'Published' ? 'white' : '#212529';
+                courseListHTML += `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 1rem; background: #f8f9fa;">
+                        <div style="flex: 1;">
+                            <h4 style="margin: 0 0 0.5rem 0; color: #2c3e50;">${course.title}</h4>
+                            <p style="margin: 0 0 0.5rem 0; color: #6c757d;">${course.students} students enrolled • ${course.completion}% completion rate</p>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <span style="background: ${statusColor}; color: ${statusTextColor}; padding: 0.2rem 0.5rem; border-radius: 12px; font-size: 0.8rem;">${course.status}</span>
+                                <span style="background: #17a2b8; color: white; padding: 0.2rem 0.5rem; border-radius: 12px; font-size: 0.8rem;">${course.duration} hours</span>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button onclick="showCourseAnalytics('${course.title}')" style="padding: 0.5rem 1rem; background: #17a2b8; color: white; border: none; border-radius: 8px; cursor: pointer;">Analytics</button>
+                            <button onclick="editCourse('${course.title}')" style="padding: 0.5rem 1rem; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer;">Edit</button>
+                        </div>
+                    </div>
+                `;
+            });
+            
             overlay.innerHTML = `
                 <div style="background: white; border-radius: 20px; padding: 2rem; max-width: 800px; width: 90%; max-height: 80vh; overflow-y: auto;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
@@ -3323,34 +3395,7 @@
                         <button onclick="this.closest('div').parentElement.remove()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">✕</button>
                     </div>
                     <div class="course-list">
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 1rem; background: #f8f9fa;">
-                            <div style="flex: 1;">
-                                <h4 style="margin: 0 0 0.5rem 0; color: #2c3e50;">📊 Financial Literacy Fundamentals</h4>
-                                <p style="margin: 0 0 0.5rem 0; color: #6c757d;">24 students enrolled • 89% completion rate</p>
-                                <div style="display: flex; gap: 0.5rem;">
-                                    <span style="background: #28a745; color: white; padding: 0.2rem 0.5rem; border-radius: 12px; font-size: 0.8rem;">Published</span>
-                                    <span style="background: #17a2b8; color: white; padding: 0.2rem 0.5rem; border-radius: 12px; font-size: 0.8rem;">8 hours</span>
-                                </div>
-                            </div>
-                            <div style="display: flex; gap: 0.5rem;">
-                                <button onclick="alert('Viewing course analytics...')" style="padding: 0.5rem 1rem; background: #17a2b8; color: white; border: none; border-radius: 8px; cursor: pointer;">Analytics</button>
-                                <button onclick="alert('Editing course content...')" style="padding: 0.5rem 1rem; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer;">Edit</button>
-                            </div>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 1rem; background: #f8f9fa;">
-                            <div style="flex: 1;">
-                                <h4 style="margin: 0 0 0.5rem 0; color: #2c3e50;">💻 Web Development Basics</h4>
-                                <p style="margin: 0 0 0.5rem 0; color: #6c757d;">18 students enrolled • 67% completion rate</p>
-                                <div style="display: flex; gap: 0.5rem;">
-                                    <span style="background: #ffc107; color: #212529; padding: 0.2rem 0.5rem; border-radius: 12px; font-size: 0.8rem;">Draft</span>
-                                    <span style="background: #17a2b8; color: white; padding: 0.2rem 0.5rem; border-radius: 12px; font-size: 0.8rem;">12 hours</span>
-                                </div>
-                            </div>
-                            <div style="display: flex; gap: 0.5rem;">
-                                <button onclick="alert('Viewing course analytics...')" style="padding: 0.5rem 1rem; background: #17a2b8; color: white; border: none; border-radius: 8px; cursor: pointer;">Analytics</button>
-                                <button onclick="alert('Editing course content...')" style="padding: 0.5rem 1rem; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer;">Edit</button>
-                            </div>
-                        </div>
+                        ${courseListHTML}
                     </div>
                     <button onclick="showContentCreation(); this.closest('div').parentElement.remove();" style="width: 100%; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; padding: 1rem; border-radius: 12px; font-weight: 600; cursor: pointer; margin-top: 1rem;">+ Create New Course</button>
                 </div>
@@ -3360,6 +3405,88 @@
             overlay.addEventListener('click', function(e) {
                 if (e.target === overlay) overlay.remove();
             });
+        }
+        
+        function showCourseAnalytics(courseName) {
+            const overlay = document.createElement('div');
+            overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; display: flex; align-items: center; justify-content: center;';
+            
+            overlay.innerHTML = `
+                <div style="background: white; border-radius: 20px; padding: 2rem; max-width: 700px; width: 90%; max-height: 80vh; overflow-y: auto;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                        <h3 style="color: #667eea; margin: 0;">📊 ${courseName} Analytics</h3>
+                        <button onclick="this.closest('div').parentElement.remove()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">✕</button>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-bottom: 2rem;">
+                        <div style="text-align: center; padding: 1.5rem; background: #f8f9fa; border-radius: 12px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #667eea;">24</div>
+                            <div style="color: #6c757d;">Total Students</div>
+                        </div>
+                        <div style="text-align: center; padding: 1.5rem; background: #f8f9fa; border-radius: 12px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #28a745;">89%</div>
+                            <div style="color: #6c757d;">Completion Rate</div>
+                        </div>
+                        <div style="text-align: center; padding: 1.5rem; background: #f8f9fa; border-radius: 12px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #17a2b8;">4.8⭐</div>
+                            <div style="color: #6c757d;">Average Rating</div>
+                        </div>
+                        <div style="text-align: center; padding: 1.5rem; background: #f8f9fa; border-radius: 12px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #ffc107;">156h</div>
+                            <div style="color: #6c757d;">Total Watch Time</div>
+                        </div>
+                    </div>
+                    <button onclick="alert('Detailed analytics report downloaded!')" style="width: 100%; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; padding: 1rem; border-radius: 12px; font-weight: 600; cursor: pointer;">Download Full Report</button>
+                </div>
+            `;
+            
+            document.body.appendChild(overlay);
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) overlay.remove();
+            });
+        }
+        
+        function editCourse(courseName) {
+            const overlay = document.createElement('div');
+            overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; display: flex; align-items: center; justify-content: center;';
+            
+            overlay.innerHTML = `
+                <div style="background: white; border-radius: 20px; padding: 2rem; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                        <h3 style="color: #667eea; margin: 0;">✏️ Edit ${courseName}</h3>
+                        <button onclick="this.closest('div').parentElement.remove()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">✕</button>
+                    </div>
+                    <form onsubmit="updateCourse(event, '${courseName}')">
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Course Title</label>
+                            <input type="text" value="${courseName}" style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px;">
+                        </div>
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Status</label>
+                            <select style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px;">
+                                <option value="Draft">Draft</option>
+                                <option value="Published">Published</option>
+                                <option value="Archived">Archived</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Description</label>
+                            <textarea placeholder="Update course description..." style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px; min-height: 100px;"></textarea>
+                        </div>
+                        <button type="submit" style="width: 100%; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; padding: 0.875rem; border-radius: 12px; font-weight: 600; cursor: pointer;">Save Changes</button>
+                    </form>
+                </div>
+            `;
+            
+            document.body.appendChild(overlay);
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) overlay.remove();
+            });
+        }
+        
+        function updateCourse(event, courseName) {
+            event.preventDefault();
+            alert(`${courseName} updated successfully!`);
+            event.target.closest('div').parentElement.remove();
         }
 
         document.addEventListener('DOMContentLoaded', initializeFeedbackForm);
