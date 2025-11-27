@@ -2251,88 +2251,76 @@
         }
 
         // Login Form Submission
-        async function submitLogin(event) {
+        function submitLogin(event) {
             event.preventDefault();
             const email = document.getElementById('loginEmail').value;
             const role = document.getElementById('loginRole').value;
             const password = document.getElementById('loginPassword').value;
             
+            if (!email || !role || !password) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
             const submitBtn = event.target.querySelector('button[type="submit"]');
             submitBtn.textContent = 'Logging in...';
             submitBtn.disabled = true;
             
-            try {
-                const response = await fetch('/api/auth/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ email, role, password })
-                });
+            // Simulate login process
+            setTimeout(() => {
+                const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
                 
-                const data = await response.json();
-                
-                if (response.ok) {
-                    localStorage.setItem('authToken', data.token);
-                    localStorage.setItem('user', JSON.stringify(data.user));
+                // Check if user exists and credentials match
+                if (storedUser.email === email && storedUser.password === password && storedUser.role === role) {
+                    localStorage.setItem('authToken', 'demo-token-' + Date.now());
                     localStorage.setItem('userRole', role);
                     checkAuthStatus();
-                    alert(`Welcome back, ${role}!`);
+                    alert(`🎉 Welcome back, ${storedUser.name}!`);
                     showSection('home');
                 } else {
-                    if (data.requiresVerification) {
-                        alert(data.error + '\n\nWould you like to resend the verification email?');
-                        // Could add resend functionality here
-                    } else {
-                        alert(data.error || 'Login failed');
-                    }
+                    alert('❌ Invalid credentials. Please check your email, password, and role.');
                 }
-            } catch (error) {
-                alert('Network error. Please try again.');
-            } finally {
+                
                 submitBtn.textContent = '🔑 Login';
                 submitBtn.disabled = false;
-            }
+            }, 1000);
         }
 
         // Signup Form Submission
-        async function submitSignup(event) {
+        function submitSignup(event) {
             event.preventDefault();
             const name = document.getElementById('signupName').value;
             const email = document.getElementById('signupEmail').value;
             const role = document.getElementById('signupRole').value;
             const password = document.getElementById('signupPassword').value;
             
+            if (!name || !email || !role || !password) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
             const submitBtn = event.target.querySelector('button[type="submit"]');
             submitBtn.textContent = 'Creating Account...';
             submitBtn.disabled = true;
             
-            try {
-                const response = await fetch('/api/auth/register', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ name, email, role, password })
-                });
+            // Simulate account creation
+            setTimeout(() => {
+                // Store user data locally
+                const userData = { name, email, role, password, createdAt: new Date().toISOString() };
+                localStorage.setItem('user', JSON.stringify(userData));
+                localStorage.setItem('authToken', 'demo-token-' + Date.now());
+                localStorage.setItem('userRole', role);
                 
-                const data = await response.json();
+                alert(`🎉 Welcome to Breaking Cycles, ${name}! Your account has been created successfully as a ${role}.`);
+                event.target.reset();
                 
-                if (response.ok) {
-                    alert(`Registration successful as ${role}! Please check your email to verify your account.`);
-                    event.target.reset();
-                    if (data.verificationUrl) {
-                        console.log('Verification URL (for testing):', data.verificationUrl);
-                    }
-                } else {
-                    alert(data.error || 'Registration failed');
-                }
-            } catch (error) {
-                alert('Network error. Please try again.');
-            } finally {
+                // Auto login and redirect to home
+                checkAuthStatus();
+                showSection('home');
+                
                 submitBtn.textContent = '🎉 Sign Up';
                 submitBtn.disabled = false;
-            }
+            }, 1000);
         }
 
         // Smooth scrolling for all links
