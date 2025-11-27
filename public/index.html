@@ -55,11 +55,6 @@
             cursor: pointer;
         }
 
-        .logo::before {
-            content: '🌟';
-            animation: pulse 2s ease-in-out infinite;
-        }
-
         @keyframes pulse {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.1); }
@@ -100,19 +95,17 @@
             color: #667eea;
         }
 
-        .mobile-menu-toggle {
-            display: none;
-            flex-direction: column;
-            cursor: pointer;
-            padding: 0.5rem;
+        .login-btn:hover {
+            background: #8B7CF6;
+            color: white;
         }
-
-        .mobile-menu-toggle span {
-            width: 25px;
-            height: 3px;
-            background: #2c3e50;
-            margin: 3px 0;
-            transition: 0.3s;
+        
+        .signup-btn:hover {
+            background: #7C3AED;
+        }
+        
+        .settings-icon:hover {
+            background: #E5E7EB;
         }
 
         .mobile-menu {
@@ -166,7 +159,7 @@
 
         /* Home Section Styles */
         .home-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #8B7CF6 0%, #6366F1 100%);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -543,12 +536,12 @@
                 align-items: center;
             }
 
-            .nav-links {
+            .auth-buttons {
                 display: none;
             }
 
             .mobile-menu-toggle {
-                display: flex;
+                display: flex !important;
             }
 
             .learn-grid,
@@ -700,25 +693,23 @@
     <!-- Navigation -->
     <nav id="navbar">
         <div class="nav-container">
-            <div class="logo" onclick="showSection('home')">Breaking Cycles</div>
-            <ul class="nav-links">
-                <li><a href="#home" class="nav-link active" onclick="showSection('home')">Home</a></li>
-                <li><a href="#learn" class="nav-link" onclick="showSection('learn')">Learn</a></li>
-                <li><a href="#community" class="nav-link" onclick="showSection('community')">Community</a></li>
-                <li><a href="#stories" class="nav-link" onclick="showSection('stories')">Stories</a></li>
-                <li><a href="#contact" class="nav-link" onclick="showSection('contact')">Contact</a></li>
-                <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
-                <li><a href="login.html" class="nav-link" id="loginLink">Login</a></li>
-                <li><a href="signup.html" class="nav-link" id="signupLink">Sign Up</a></li>
-            </ul>
-            <div class="nav-icons" style="display: flex; align-items: center; gap: 1rem;">
-                <a href="profile.html" id="profileLink" style="display:none; color: #2c3e50; text-decoration: none; font-size: 1.5rem;">👤</a>
-                <button onclick="toggleSettings()" style="background:none; border:none; color:#2c3e50; cursor:pointer; font-size: 1.8rem; padding: 0.5rem;">⚙️</button>
+            <div class="logo" onclick="showSection('home')">
+                <span style="font-size: 2rem; margin-right: 0.5rem;">☀️</span>
+                Breaking Cycles
             </div>
-            <div class="mobile-menu-toggle" onclick="toggleMobileMenu()">
-                <span></span>
-                <span></span>
-                <span></span>
+            <div class="nav-right" style="display: flex; align-items: center; gap: 1rem;">
+                <div class="auth-buttons" style="display: flex; gap: 0.5rem;">
+                    <button class="login-btn" onclick="showSection('login')" style="background: transparent; border: 2px solid #8B7CF6; color: #8B7CF6; padding: 0.5rem 1.5rem; border-radius: 25px; cursor: pointer; font-weight: 500;">Login</button>
+                    <button class="signup-btn" onclick="showSection('signup')" style="background: #8B7CF6; border: 2px solid #8B7CF6; color: white; padding: 0.5rem 1.5rem; border-radius: 25px; cursor: pointer; font-weight: 500;">Sign Up</button>
+                </div>
+                <div class="settings-icon" onclick="toggleSettings()" style="background: #F3F4F6; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; margin-left: 0.5rem;">
+                    <span style="font-size: 1.2rem;">⚙️</span>
+                </div>
+                <div class="mobile-menu-toggle" onclick="toggleMobileMenu()" style="display: none; flex-direction: column; cursor: pointer; padding: 0.5rem;">
+                    <span style="width: 25px; height: 3px; background: #667eea; margin: 3px 0; transition: 0.3s;"></span>
+                    <span style="width: 25px; height: 3px; background: #667eea; margin: 3px 0; transition: 0.3s;"></span>
+                    <span style="width: 25px; height: 3px; background: #667eea; margin: 3px 0; transition: 0.3s;"></span>
+                </div>
             </div>
         </div>
         <div class="mobile-menu" id="mobileMenu">
@@ -734,21 +725,7 @@
     <!-- HOME SECTION -->
     <section id="home" class="section home-section active">
         <div class="hero-content">
-            <h1>Breaking the Cycle</h1>
-            <p class="mission-statement">
-                Breaking the cycle of poverty among women through education and empowerment.
-            </p>
-            <div class="cta-buttons">
-                <a href="#community" class="btn btn-primary" onclick="showSection('community')">
-                    🤝 Join Community
-                </a>
-                <a href="#learn" class="btn btn-secondary" onclick="showSection('learn')">
-                    📚 Start Learning
-                </a>
-                <a href="#stories" class="btn btn-tertiary" onclick="showSection('stories')">
-                    ✨ Read Stories
-                </a>
-            </div>
+            <h1 style="font-size: 4rem; font-weight: 800; margin-bottom: 2rem; line-height: 1.1;">Breaking the Cycle</h1>
         </div>
     </section>
 
