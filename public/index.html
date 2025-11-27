@@ -812,6 +812,145 @@
             color: #8B7CF6;
             pointer-events: none;
         }
+
+        /* Dashboard Styles */
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .dashboard-header h2 {
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .dashboard-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(139, 124, 246, 0.1);
+            border: 1px solid rgba(139, 124, 246, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(139, 124, 246, 0.15);
+        }
+
+        .card-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+
+        .dashboard-card h3 {
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .dashboard-card p {
+            color: #718096;
+            margin-bottom: 20px;
+        }
+
+        .progress-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .progress-item span:first-child {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .progress-bar {
+            flex: 2;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #8B7CF6, #667eea);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .activity-item, .goal-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            padding: 8px 0;
+        }
+
+        .activity-dot {
+            width: 8px;
+            height: 8px;
+            background: #8B7CF6;
+            border-radius: 50%;
+        }
+
+        .goal-check {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .goal-item.completed .goal-check {
+            background: #8B7CF6;
+            border-color: #8B7CF6;
+            color: white;
+        }
+
+        .achievements {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .achievement-badge {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+            border-radius: 10px;
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .achievement-badge.earned {
+            background: linear-gradient(135deg, #8B7CF6, #667eea);
+            border-color: #8B7CF6;
+            color: white;
+        }
+
+        .badge-icon {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .badge-name {
+            font-size: 12px;
+            font-weight: 500;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -1502,6 +1641,107 @@
     </section>
 
 
+
+    <!-- DASHBOARD SECTION -->
+    <section id="dashboard" class="section">
+        <div class="container">
+            <div class="dashboard-header">
+                <h2>Welcome back, <span id="dashboardUserName"></span>!</h2>
+                <p>Continue your journey of growth and empowerment</p>
+            </div>
+            
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <div class="card-icon">📚</div>
+                    <h3>My Courses</h3>
+                    <p>Continue learning and growing</p>
+                    <div class="course-progress">
+                        <div class="progress-item">
+                            <span>Financial Literacy</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 65%"></div>
+                            </div>
+                            <span>65%</span>
+                        </div>
+                        <div class="progress-item">
+                            <span>Web Development</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 30%"></div>
+                            </div>
+                            <span>30%</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="showSection('learn')">View All Courses</button>
+                </div>
+                
+                <div class="dashboard-card">
+                    <div class="card-icon">💬</div>
+                    <h3>Community Activity</h3>
+                    <p>Stay connected with your sisters</p>
+                    <div class="activity-list">
+                        <div class="activity-item">
+                            <span class="activity-dot"></span>
+                            <span>New message in Young Mothers Circle</span>
+                        </div>
+                        <div class="activity-item">
+                            <span class="activity-dot"></span>
+                            <span>Sarah shared a success story</span>
+                        </div>
+                        <div class="activity-item">
+                            <span class="activity-dot"></span>
+                            <span>3 new members joined today</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="showSection('community')">Join Conversations</button>
+                </div>
+                
+                <div class="dashboard-card">
+                    <div class="card-icon">🎯</div>
+                    <h3>Your Goals</h3>
+                    <p>Track your progress and achievements</p>
+                    <div class="goals-list">
+                        <div class="goal-item completed">
+                            <span class="goal-check">✓</span>
+                            <span>Complete profile setup</span>
+                        </div>
+                        <div class="goal-item">
+                            <span class="goal-check"></span>
+                            <span>Finish first course module</span>
+                        </div>
+                        <div class="goal-item">
+                            <span class="goal-check"></span>
+                            <span>Connect with 5 community members</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary">Set New Goals</button>
+                </div>
+                
+                <div class="dashboard-card">
+                    <div class="card-icon">⭐</div>
+                    <h3>Achievements</h3>
+                    <p>Celebrate your milestones</p>
+                    <div class="achievements">
+                        <div class="achievement-badge earned">
+                            <span class="badge-icon">🌟</span>
+                            <span class="badge-name">First Steps</span>
+                        </div>
+                        <div class="achievement-badge earned">
+                            <span class="badge-icon">💪</span>
+                            <span class="badge-name">Committed Learner</span>
+                        </div>
+                        <div class="achievement-badge">
+                            <span class="badge-icon">🎓</span>
+                            <span class="badge-name">Course Completer</span>
+                        </div>
+                        <div class="achievement-badge">
+                            <span class="badge-icon">👥</span>
+                            <span class="badge-name">Community Leader</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <!-- CONTACT SECTION -->
     <section id="contact" class="section contact-section">
@@ -2281,8 +2521,12 @@
                     localStorage.setItem('authToken', 'demo-token-' + Date.now());
                     localStorage.setItem('userRole', role);
                     checkAuthStatus();
+                    
+                    // Update dashboard with user name
+                    document.getElementById('dashboardUserName').textContent = storedUser.name;
+                    
                     alert(`🎉 Welcome back, ${storedUser.name}!`);
-                    showSection('home');
+                    showSection('dashboard');
                 } else {
                     alert('❌ Invalid credentials. Please check your email, password, and role.');
                 }
@@ -2317,12 +2561,15 @@
                 localStorage.setItem('authToken', 'demo-token-' + Date.now());
                 localStorage.setItem('userRole', role);
                 
+                // Update dashboard with user name
+                document.getElementById('dashboardUserName').textContent = name;
+                
                 alert(`🎉 Welcome to Breaking Cycles, ${name}! Your account has been created successfully as a ${role}.`);
                 event.target.reset();
                 
-                // Auto login and redirect to home
+                // Auto login and redirect to dashboard
                 checkAuthStatus();
-                showSection('home');
+                showSection('dashboard');
                 
                 submitBtn.textContent = '🎉 Sign Up';
                 submitBtn.disabled = false;
