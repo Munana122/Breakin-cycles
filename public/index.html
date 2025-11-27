@@ -786,6 +786,32 @@
             font-size: 1.5rem;
             cursor: pointer;
         }
+        
+        .custom-select {
+            position: relative;
+            width: 100%;
+        }
+        
+        .custom-select select {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #8B7CF6;
+            border-radius: 25px;
+            font-size: 1rem;
+            background: white;
+            appearance: none;
+            cursor: pointer;
+        }
+        
+        .custom-select::after {
+            content: '▼';
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8B7CF6;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -1420,7 +1446,7 @@
                         <input type="email" id="loginEmail" name="email" required placeholder="your.email@example.com">
                     </div>
                     <div class="form-group">
-                        <label for="loginRole">Login as *</label>
+                        <label for="loginRole">Join as:</label>
                         <select id="loginRole" name="role" required style="width: 100%; padding: 1rem; border: 2px solid #ecf0f1; border-radius: 10px; font-size: 1rem;">
                             <option value="">Select your role</option>
                             <option value="student">👩‍🎓 Student</option>
@@ -1452,7 +1478,7 @@
                         <input type="email" id="signupEmail" name="email" required placeholder="your.email@example.com">
                     </div>
                     <div class="form-group">
-                        <label for="signupRole">I am a *</label>
+                        <label for="signupRole">Join as:</label>
                         <select id="signupRole" name="role" required style="width: 100%; padding: 1rem; border: 2px solid #ecf0f1; border-radius: 10px; font-size: 1rem;">
                             <option value="">Select your role</option>
                             <option value="student">👩‍🎓 Student - I want to learn and grow</option>
