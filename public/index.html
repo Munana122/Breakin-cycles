@@ -999,6 +999,20 @@
             background: #fff3cd;
             color: #856404;
         }
+
+        .teacher-profile {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .profile-stat {
+            text-align: center;
+            flex: 1;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
     </style>
 </head>
 <body>
@@ -2600,7 +2614,7 @@
             if (token && user.name) {
                 authButtons.style.display = 'none';
                 userInfo.style.display = 'flex';
-                userName.textContent = user.name;
+                userName.textContent = `${user.name} (${user.role})`;
             } else {
                 authButtons.style.display = 'flex';
                 userInfo.style.display = 'none';
@@ -3070,7 +3084,7 @@
                                 <span class="stat-label">Completion Rate</span>
                             </div>
                         </div>
-                        <button class="btn btn-primary" onclick="alert('Student management coming soon!')">Manage Students</button>
+                        <button class="btn btn-primary" onclick="showStudentManagement()">Manage Students</button>
                     </div>
                     
                     <div class="dashboard-card">
@@ -3087,7 +3101,7 @@
                                 <span class="status draft">Draft</span>
                             </div>
                         </div>
-                        <button class="btn btn-primary" onclick="alert('Content creation coming soon!')">Create Content</button>
+                        <button class="btn btn-primary" onclick="showContentCreation()">Create Content</button>
                     </div>
                     
                     <div class="dashboard-card">
@@ -3104,7 +3118,7 @@
                                 <span>New question in Q&A forum</span>
                             </div>
                         </div>
-                        <button class="btn btn-primary" onclick="showSection('community')">Join Mentoring</button>
+                        <button class="btn btn-primary" onclick="joinMentoring()">Join Mentoring</button>
                     </div>
                     
                     <div class="dashboard-card">
@@ -3124,6 +3138,120 @@
                     </div>
                 `;
             }
+        }
+
+        // Teacher dashboard functions
+        function showStudentManagement() {
+            const overlay = document.createElement('div');
+            overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; display: flex; align-items: center; justify-content: center;';
+            
+            overlay.innerHTML = `
+                <div style="background: white; border-radius: 20px; padding: 2rem; max-width: 800px; width: 90%; max-height: 80vh; overflow-y: auto;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                        <h3 style="color: #667eea; margin: 0;">👩🎓 Student Management</h3>
+                        <button onclick="this.closest('div').parentElement.remove()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">✕</button>
+                    </div>
+                    <div class="student-list">
+                        <div class="student-item" style="display: flex; justify-content: between; align-items: center; padding: 1rem; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 1rem;">
+                            <div style="flex: 1;">
+                                <h4 style="margin: 0; color: #2c3e50;">Sarah Johnson</h4>
+                                <p style="margin: 0.5rem 0; color: #6c757d;">Financial Literacy - 85% Complete</p>
+                                <div style="background: #e9ecef; border-radius: 10px; height: 6px; margin: 0.5rem 0;">
+                                    <div style="background: #28a745; height: 100%; width: 85%; border-radius: 10px;"></div>
+                                </div>
+                            </div>
+                            <button style="padding: 0.5rem 1rem; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">Message</button>
+                        </div>
+                        <div class="student-item" style="display: flex; justify-content: between; align-items: center; padding: 1rem; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 1rem;">
+                            <div style="flex: 1;">
+                                <h4 style="margin: 0; color: #2c3e50;">Maria Garcia</h4>
+                                <p style="margin: 0.5rem 0; color: #6c757d;">Web Development - 45% Complete</p>
+                                <div style="background: #e9ecef; border-radius: 10px; height: 6px; margin: 0.5rem 0;">
+                                    <div style="background: #ffc107; height: 100%; width: 45%; border-radius: 10px;"></div>
+                                </div>
+                            </div>
+                            <button style="padding: 0.5rem 1rem; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">Message</button>
+                        </div>
+                        <div class="student-item" style="display: flex; justify-content: between; align-items: center; padding: 1rem; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 1rem;">
+                            <div style="flex: 1;">
+                                <h4 style="margin: 0; color: #2c3e50;">Aisha Patel</h4>
+                                <p style="margin: 0.5rem 0; color: #6c757d;">Entrepreneurship - 92% Complete</p>
+                                <div style="background: #e9ecef; border-radius: 10px; height: 6px; margin: 0.5rem 0;">
+                                    <div style="background: #28a745; height: 100%; width: 92%; border-radius: 10px;"></div>
+                                </div>
+                            </div>
+                            <button style="padding: 0.5rem 1rem; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">Message</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(overlay);
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) overlay.remove();
+            });
+        }
+        
+        function showContentCreation() {
+            const overlay = document.createElement('div');
+            overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; display: flex; align-items: center; justify-content: center;';
+            
+            overlay.innerHTML = `
+                <div style="background: white; border-radius: 20px; padding: 2rem; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                        <h3 style="color: #667eea; margin: 0;">📚 Create New Course</h3>
+                        <button onclick="this.closest('div').parentElement.remove()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">✕</button>
+                    </div>
+                    <form onsubmit="createCourse(event)">
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Course Title *</label>
+                            <input type="text" required placeholder="e.g., Advanced Financial Planning" style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px;">
+                        </div>
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Category *</label>
+                            <select required style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px;">
+                                <option value="">Select category</option>
+                                <option value="financial">Financial Literacy</option>
+                                <option value="tech">Coding & Tech</option>
+                                <option value="business">Entrepreneurship</option>
+                                <option value="beauty">Beauty & Wellness</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Description *</label>
+                            <textarea required placeholder="Describe what students will learn..." style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px; min-height: 100px;"></textarea>
+                        </div>
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Duration (hours)</label>
+                            <input type="number" placeholder="e.g., 8" style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px;">
+                        </div>
+                        <button type="submit" style="width: 100%; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; padding: 0.875rem; border-radius: 12px; font-weight: 600; cursor: pointer;">Create Course</button>
+                    </form>
+                </div>
+            `;
+            
+            document.body.appendChild(overlay);
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) overlay.remove();
+            });
+        }
+        
+        function createCourse(event) {
+            event.preventDefault();
+            alert('Course created successfully! It will be reviewed and published soon.');
+            event.target.closest('div').parentElement.remove();
+        }
+        
+        function joinMentoring() {
+            showSection('community');
+            setTimeout(() => {
+                alert('As a teacher, you can now mentor students in all chat rooms!');
+            }, 500);
+        }
+        
+        function showTeacherProfile() {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            alert(`Teacher Profile: ${user.name}\n\nStats:\n- 156 Students Taught\n- 12 Courses Created\n- 4.9⭐ Rating\n- 2.5k Hours Taught\n\nAchievements: Top Mentor, Knowledge Sharer, Community Leader`);
         }
 
         document.addEventListener('DOMContentLoaded', initializeFeedbackForm);
