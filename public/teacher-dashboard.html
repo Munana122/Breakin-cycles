@@ -416,37 +416,47 @@
 
     <!-- Students Section -->
     <section id="students" class="section">
-      <div class="filters">
-        <div class="filter-group">
-          <label>Search Students</label>
-          <input type="text" id="studentSearch" placeholder="Search students..." onkeyup="filterStudents()">
+      <div style="max-width: 800px; margin: 0 auto;">
+        <!-- Header Card -->
+        <div style="background: white; border-radius: 20px; box-shadow: 0 10px 40px rgba(102, 126, 234, 0.15); padding: 2rem; margin-bottom: 2rem;">
+          <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+            <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">📊</div>
+            <h2 style="margin: 0; color: #8b5cf6; font-size: 1.5rem; font-weight: 600;">Student Progress Dashboard</h2>
+          </div>
+          
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;">
+            <div>
+              <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #374151; font-size: 0.9rem;">Search Students</label>
+              <input type="text" id="studentSearch" placeholder="Search students..." onkeyup="filterStudents()" style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 12px; font-size: 0.9rem; background: #f9fafb;" onfocus="this.style.borderColor='#8b5cf6'; this.style.background='white'" onblur="this.style.borderColor='#e5e7eb'; this.style.background='#f9fafb'">
+            </div>
+            <div>
+              <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #374151; font-size: 0.9rem;">Course</label>
+              <select id="courseFilterStudents" onchange="filterStudents()" style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 12px; font-size: 0.9rem; background: #f9fafb; cursor: pointer;" onfocus="this.style.borderColor='#8b5cf6'; this.style.background='white'" onblur="this.style.borderColor='#e5e7eb'; this.style.background='#f9fafb'">
+                <option value="">All Courses</option>
+              </select>
+            </div>
+            <div>
+              <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #374151; font-size: 0.9rem;">Progress</label>
+              <select id="progressFilter" onchange="filterStudents()" style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 12px; font-size: 0.9rem; background: #f9fafb; cursor: pointer;" onfocus="this.style.borderColor='#8b5cf6'; this.style.background='white'" onblur="this.style.borderColor='#e5e7eb'; this.style.background='#f9fafb'">
+                <option value="">All Progress</option>
+                <option value="low">Low Progress</option>
+                <option value="medium">Medium Progress</option>
+                <option value="high">High Progress</option>
+              </select>
+            </div>
+            <div>
+              <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #374151; font-size: 0.9rem;">Activity</label>
+              <select id="activityFilter" onchange="filterStudents()" style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 12px; font-size: 0.9rem; background: #f9fafb; cursor: pointer;" onfocus="this.style.borderColor='#8b5cf6'; this.style.background='white'" onblur="this.style.borderColor='#e5e7eb'; this.style.background='#f9fafb'">
+                <option value="">All Students</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </div>
+          </div>
         </div>
-        <div class="filter-group">
-          <label>Course</label>
-          <select id="courseFilterStudents" onchange="filterStudents()">
-            <option value="">All Courses</option>
-          </select>
-        </div>
-        <div class="filter-group">
-          <label>Progress</label>
-          <select id="progressFilter" onchange="filterStudents()">
-            <option value="">All Progress</option>
-            <option value="low">Low (0-30%)</option>
-            <option value="medium">Medium (31-70%)</option>
-            <option value="high">High (71-100%)</option>
-          </select>
-        </div>
-        <div class="filter-group">
-          <label>Activity</label>
-          <select id="activityFilter" onchange="filterStudents()">
-            <option value="">All Students</option>
-            <option value="active">Active (Last 7 days)</option>
-            <option value="inactive">Inactive (7+ days)</option>
-          </select>
-        </div>
-      </div>
 
-      <div id="studentsGrid"></div>
+        <div id="studentsGrid"></div>
+      </div>
     </section>
 
     <!-- Resources Section -->
@@ -713,6 +723,7 @@
             <div style="display: flex; gap: 0.5rem;">
               <button class="btn" onclick="previewCourse(${course.id})">👁️ Preview</button>
               <button class="btn btn-secondary" onclick="viewCourseDetails(${course.id})">📋 Details</button>
+              ${course.selected ? `<button class="btn btn-success" onclick="viewCourseStudents('${course.title}')">👥 Students</button>` : ''}
             </div>
           </div>
         </div>
@@ -721,30 +732,53 @@
 
     function loadStudents() {
       const grid = document.getElementById('studentsGrid');
-      grid.innerHTML = students.map(student => `
-        <div class="student-card" data-courses="${student.courses.join(',')}" data-status="${student.status}">
-          <div class="student-avatar">${student.avatar}</div>
-          <div class="student-info">
-            <h4>${student.name}</h4>
-            <p>${student.email}</p>
-            <div style="margin: 0.5rem 0;">
-              ${student.courses.map(course => `
-                <div style="margin: 0.25rem 0;">
-                  <small><strong>${course}:</strong> ${student.progress[course]}%</small>
-                  <div class="progress-bar">
-                    <div class="progress-fill" style="width: ${student.progress[course]}%"></div>
-                  </div>
+      const selectedCourse = document.getElementById('courseFilterStudents').value;
+      
+      grid.innerHTML = students.map(student => {
+        // Filter courses to show only the selected one if a filter is applied
+        const coursesToShow = selectedCourse ? 
+          student.courses.filter(course => course === selectedCourse) : 
+          student.courses;
+        
+        if (selectedCourse && coursesToShow.length === 0) {
+          return ''; // Don't show student if they're not enrolled in the selected course
+        }
+        
+        return `
+          <div style="background: white; border-radius: 20px; box-shadow: 0 10px 40px rgba(102, 126, 234, 0.15); padding: 2rem; margin-bottom: 1.5rem; transition: transform 0.2s;" data-courses="${student.courses.join(',')}" data-status="${student.status}" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+              <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #8b5cf6, #6366f1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 1.2rem;">${student.avatar}</div>
+                <div>
+                  <h3 style="margin: 0; color: #1f2937; font-weight: 600; font-size: 1.1rem;">${student.name}</h3>
+                  <p style="margin: 0; color: #6b7280; font-size: 0.9rem;">${student.email}</p>
                 </div>
-              `).join('')}
+              </div>
+              <div style="display: flex; gap: 0.5rem;">
+                <button onclick="messageStudent(${student.id})" style="width: 40px; height: 40px; background: #3b82f6; color: white; border: none; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; transition: background 0.2s;" onmouseover="this.style.background='#2563eb'" onmouseout="this.style.background='#3b82f6'">💬</button>
+                <button onclick="viewStudentDetails(${student.id})" style="width: 40px; height: 40px; background: #6b7280; color: white; border: none; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; transition: background 0.2s;" onmouseover="this.style.background='#4b5563'" onmouseout="this.style.background='#6b7280'">👁️</button>
+              </div>
             </div>
-            <small>Last active: ${student.lastActive}</small>
+            
+            ${coursesToShow.map(course => `
+              <div style="margin-bottom: 1rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                  <span style="font-weight: 600; color: #374151; font-size: 0.9rem;">${course}:</span>
+                  <span style="font-weight: 600; color: #8b5cf6; font-size: 0.9rem;">${student.progress[course]}%</span>
+                </div>
+                <div style="background: #e5e7eb; border-radius: 10px; height: 8px; overflow: hidden;">
+                  <div style="background: linear-gradient(135deg, #8b5cf6, #6366f1); height: 100%; width: ${student.progress[course]}%; border-radius: 10px; transition: width 0.3s ease;"></div>
+                </div>
+              </div>
+            `).join('')}
+            
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem; color: #6b7280; font-size: 0.85rem;">
+              <div style="width: 16px; height: 16px; background: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem;">⚡</div>
+              <span>Last active: ${student.lastActive}</span>
+            </div>
           </div>
-          <div class="student-actions">
-            <button class="btn" onclick="messageStudent(${student.id})">💬</button>
-            <button class="btn btn-secondary" onclick="viewStudentDetails(${student.id})">👁️</button>
-          </div>
-        </div>
-      `).join('');
+        `;
+      }).filter(html => html !== '').join('');
     }
 
     function loadResources() {
@@ -909,7 +943,27 @@
 
     function saveSelectedCourses() {
       const selected = availableCourses.filter(c => c.selected);
+      
+      // Update course filter dropdown
+      const courseFilter = document.getElementById('courseFilterStudents');
+      courseFilter.innerHTML = '<option value="">All Courses</option>' + 
+        selected.map(course => `<option value="${course.title}">${course.title}</option>`).join('');
+      
       alert(`Selected ${selected.length} courses to teach: ${selected.map(c => c.title).join(', ')}`);
+      loadCourses(); // Refresh to show Students button
+    }
+    
+    function viewCourseStudents(courseTitle) {
+      // Set the course filter and switch to students tab
+      document.getElementById('courseFilterStudents').value = courseTitle;
+      showSection('students');
+      
+      // Update the active tab
+      document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+      document.querySelector('[onclick="showSection(\'students\')"]').classList.add('active');
+      
+      // Filter students by the selected course
+      filterStudents();
     }
 
     function messageStudent(studentId) {
